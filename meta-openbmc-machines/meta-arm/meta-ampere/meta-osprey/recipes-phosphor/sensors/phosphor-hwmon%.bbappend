@@ -14,6 +14,10 @@ NAMES = " \
         i2c@1e78a000/i2c-bus@100/lm75@4f \
         i2c@1e78a000/i2c-bus@100/lm95241@19 \
         i2c@1e78a000/i2c-bus@100/mcp98243@1a \
+        i2c@1e78a000/i2c-bus@140/ina219@40 \
+        i2c@1e78a000/i2c-bus@140/ina219@41 \
+        i2c@1e78a000/i2c-bus@140/ina219@42 \
+        i2c@1e78a000/i2c-bus@140/ina219@43 \
         "
 
 ITEMSFMT = "ahb/apb/{0}.conf"
