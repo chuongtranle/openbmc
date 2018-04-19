@@ -4,6 +4,7 @@ OBMC_MACHINE_FEATURES += "\
 	obmc-phosphor-chassis-mgmt \
 	obmc-chassis-state-mgmt \
         obmc-bmc-state-mgmt \
+	obmc-host-ipmi \
         "
 
 PREFERRED_PROVIDER_virtual/obmc-flash-mgmt = "packagegroup-ampere-apps"
