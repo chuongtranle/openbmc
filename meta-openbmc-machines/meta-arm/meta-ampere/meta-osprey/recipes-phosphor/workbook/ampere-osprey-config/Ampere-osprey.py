@@ -22,13 +22,18 @@ EXIT_STATE_DEPEND = {
                 },
         }
 
-FRU_INSTANCES = {}
+FRU_INSTANCES = {
+            '<inventory_root>/system/chassis/motherboard/bmc' : { 'fru_type' : 'BMC','is_fru' : False, 'manufacturer' : 'ASPEED' },
+        }
+
 
 # I believe these numbers need to match the yaml file used to create the c++ ipmi map.
 # the devices have types, but I don't believe that factors in here, I think these are
 # just unique IDs.
 ID_LOOKUP = {
-            'FRU' : {},
+            'FRU' : {
+                0x03 : '<inventory_root>/system/chassis/motherboard',
+            },
             # The number at the end needs to match the FRU ID.
             # https://github.com/openbmc/skeleton/blob/master/pysystemmgr/system_manager.py#L143
             # The parameter for it is of type 'y' (unsigned 8-bit integer) presumably decimal?
