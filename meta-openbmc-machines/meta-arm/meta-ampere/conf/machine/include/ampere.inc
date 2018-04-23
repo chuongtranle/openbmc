@@ -11,6 +11,3 @@ PREFERRED_PROVIDER_virtual/obmc-flash-mgmt = "packagegroup-ampere-apps"
 PREFERRED_PROVIDER_virtual/obmc-chassis-mgmt = "packagegroup-ampere-apps"
 PREFERRED_PROVIDER_virtual/obmc-system-mgmt = "packagegroup-ampere-apps"
 PREFERRED_PROVIDER_virtual/obmc-inventory-data ?= "${VIRTUAL-RUNTIME_skeleton_workbook}"
-
-# Ampere Computing LLC Chassis Power Control
-OBMC_IMAGE_EXTRA_INSTALL_append = " ampere-powerctrl"

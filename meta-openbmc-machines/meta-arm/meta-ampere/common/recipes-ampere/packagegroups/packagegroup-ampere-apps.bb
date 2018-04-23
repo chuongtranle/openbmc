@@ -31,6 +31,7 @@ RDEPENDS_${PN}-chassis = " \
 	obmc-button-power \
 	obmc-button-reset \
 	obmc-control-chassis \
+	ampere-powerctrl \
 	"
 
 SUMMARY_${PN}-system = "Ampere System"
