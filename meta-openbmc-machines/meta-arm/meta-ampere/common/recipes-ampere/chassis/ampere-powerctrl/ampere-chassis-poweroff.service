@@ -1,0 +1,9 @@
+[Unit]
+Description=Ampere Computing LLC Power OFF Chassis
+Conflicts=obmc-chassis-poweron@0.target
+
+[Service]
+RemainAfterExit=yes
+Type=oneshot
+ExecStart=/usr/bin/env ampere_power_ctrl.sh off
+SyslogIdentifier=ampere_power_ctrl.sh
