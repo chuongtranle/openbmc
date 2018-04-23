@@ -1,4 +1,4 @@
-3:
+0:
   /system/chassis/motherboard:
     entityID: 7
     entityInstance: 1
@@ -21,7 +21,7 @@
           IPMIFruProperty: Name
           IPMIFruSection: Board
   /system/chassis:
-    entityID: 7
+    entityID: 23
     entityInstance: 1
     interfaces:
       xyz.openbmc_project.Inventory.Decorator.Asset:
@@ -35,7 +35,7 @@
           IPMIFruProperty: Type
           IPMIFruSection: Chassis
   /system:
-    entityID: 7
+    entityID: 25
     entityInstance: 1
     interfaces:
       xyz.openbmc_project.Inventory.Item:
