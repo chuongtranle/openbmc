@@ -43,8 +43,27 @@ ID_LOOKUP = {
         }
 
 GPIO_CONFIG = {}
+GPIO_CONFIG['CPU_PWROK'] = \
+        {'gpio_pin': 'G0', 'direction': 'in'}
+
+GPIO_CONFIG['BMC_GPIOC6_SYS_COLD_RST_L'] = \
+        {'gpio_pin': 'C6', 'direction': 'out'}
+
+GPIO_CONFIG['POWER_BUTTON'] = \
+        {'gpio_pin': 'D0', 'direction': 'both'}
+
+GPIO_CONFIG['RESET_BUTTON'] = \
+        {'gpio_pin': 'D1', 'direction': 'both'}
+
 HWMON_CONFIG = {}
-GPIO_CONFIGS = {}
+GPIO_CONFIGS = {
+    'power_config' : {
+        'power_good_in' : 'CPU_PWROK',
+        'reset_outs' : [
+            ('BMC_GPIOC6_SYS_COLD_RST_L', False),
+        ],
+    },
+}
 
 # Miscellaneous non-poll sensor with system specific properties.
 # The sensor id is the same as those defined in ID_LOOKUP['SENSOR'].
