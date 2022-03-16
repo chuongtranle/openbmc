@@ -1,0 +1,33 @@
+From 65a46bacde40a6c625b3f53b6b3ca8474125d1a8 Mon Sep 17 00:00:00 2001
+From: Hieu Huynh <hieuh@os.amperecomputing.com>
+Date: Fri, 6 Sep 2024 09:46:59 +0000
+Subject: [PATCH] Get UUID from inventory subtree
+
+Currently, the phosphor-host-ipmid is getting UUID information from the first
+object path that includes "Common.UUID" interface. But the UUID can be obtained
+from the MCTP/FRU...
+The system UUID should be got from the object path that has the prefix
+"/xyz/openbmc_project/inventory". This commit updates subtreepath parameter
+from "/" to "/xyz/openbmc_project/inventory" to fix the issue.
+
+Signed-off-by: Hieu Huynh <hieuh@os.amperecomputing.com>
+---
+ apphandler.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/apphandler.cpp b/apphandler.cpp
+index e1450df..0eab4fc 100644
+--- a/apphandler.cpp
++++ b/apphandler.cpp
+@@ -852,7 +852,7 @@ auto ipmiAppGetSystemGuid(ipmi::Context::ptr& ctx)
+ 
+     // Get the Inventory object implementing BMC interface
+     ipmi::DbusObjectInfo objectInfo{};
+-    boost::system::error_code ec = ipmi::getDbusObject(ctx, uuidInterface,
++    boost::system::error_code ec = ipmi::getDbusObject(ctx, uuidInterface, ipmi::sensor::inventoryRoot,
+                                                        objectInfo);
+     if (ec.value())
+     {
+-- 
+2.25.1
+

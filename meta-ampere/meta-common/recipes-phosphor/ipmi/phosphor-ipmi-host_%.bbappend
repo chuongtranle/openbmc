@@ -1,9 +1,24 @@
 FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
 
+PACKAGECONFIG[dynamic-storages-only] = "-Ddynamic-storages-only=enabled, -Ddynamic-storages-only=disabled"
+
 RRECOMMENDS:${PN} += "ipmitool"
 RDEPENDS:${PN} += "bash"
 
 SRC_URI += "\
+            file://0001-Allow-user-access-from-external-repos.patch \
+            file://0002-Response-thresholds-for-Get-SDR-command.patch \
+            file://0003-dbus-sdr-support-static-FRU-s-ID-configuration.patch \
+            file://0004-dcmi-Support-fully-power-limit-setting-commands.patch \
+            file://0005-dbus-sdr-sel-support-getting-sensor-number-from-stat.patch \
+            file://0006-Correct-chassis-s-PowerState-reading-condition.patch \
+            file://0007-chassishandler-Interpret-intrusion-sensor-values.patch \
+            file://0008-dbus-sdr-support-to-get-PLDM-sensor-EIDs.patch \
+            file://0009-dcmi-Support-Set-Get-AssetTag-to-FRU.patch \
+            file://0010-Add-support-read-System-Firmware-Version.patch \
+            file://0011-dbus-sdr-round-up-the-M-factor-of-sensor.patch \
+            file://0012-Get-UUID-from-inventory-subtree.patch \
+            file://0013-dbus-sdr-replace-sort-with-stable_sort-function.patch \
             file://ampere-phosphor-softpoweroff \
             file://ampere.xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service \
            "
