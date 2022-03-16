@@ -1,0 +1,137 @@
+From ef385444d0543a15bc8a9d5e36865ebf417770f1 Mon Sep 17 00:00:00 2001
+From: HuyLe <hule@amperecomputing.com>
+Date: Tue, 30 Jul 2024 09:08:40 +0700
+Subject: [PATCH 10/13] Add support read System Firmware Version
+
+Add missing code to read the 'System Firmware Version'. Moreover, does
+not provide support for writing to set System Firmware Version. To set
+System Firmware Version should be executed by the Host OS or UEFI using
+the SMBus System Interface (SSIF)
+Below to Read System FirmWare Version
+- Find all object path included "/xyz/openbmc_project/software" and
+xyz.openbmc_project.Software.Version interface
+- Find the property of Purpose included string ends with
+"VersionPurpose.Host"
+- Get the Firmware Version value
+
+Tested:
+ $ipmitool mc getsysinfo system_fw_version
+  03.05.00002001
+ $ipmitool mc setsysinfo system_fw_version 03.05.001-rc
+  setsysinfo system_fw_version parameter not supported
+
+Signed-off-by: HuyLe <hule@amperecomputing.com>
+---
+ apphandler.cpp | 68 +++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 64 insertions(+), 4 deletions(-)
+
+diff --git a/apphandler.cpp b/apphandler.cpp
+index 2ce19e8..dda3e5e 100644
+--- a/apphandler.cpp
++++ b/apphandler.cpp
+@@ -1292,6 +1292,50 @@ ipmi::RspType<uint8_t, // session handle,
+     return ipmi::responseInvalidFieldRequest();
+ }
+ 
++std::optional<std::string> getSysFWVersion(ipmi::Context::ptr& ctx)
++{
++    ipmi::ObjectTree objectTree;
++    std::string purpHostStr = "VersionPurpose.Host";
++    boost::system::error_code ec =
++        ipmi::getAllDbusObjects(ctx, softwareRoot, versionIntf, objectTree);
++    if (ec.value())
++    {
++        return std::nullopt;
++    }
++
++    ipmi::PropertyMap props;
++    for (const auto& [objPath, serviceMap] : objectTree)
++    {
++        for (const auto& [service, intfs] : serviceMap)
++        {
++            ec = ipmi::getAllDbusProperties(ctx, service, objPath, versionIntf,
++                                            props);
++            if (ec.value())
++            {
++                return std::nullopt;
++            }
++
++            std::string purposeProp = std::string(
++                ipmi::mappedVariant<std::string>(props, "Purpose", ""));
++
++            /*
++             * Check if the string ends with "VersionPurpose.Host"
++             * If have get firmware version
++             */
++            if (!purposeProp.ends_with(purpHostStr))
++            {
++                continue;
++            }
++
++            std::string sysFWVersion = std::string(
++                ipmi::mappedVariant<std::string>(props, "Version", ""));
++
++            return sysFWVersion;
++        }
++    }
++    return std::nullopt;
++}
++
+ static std::unique_ptr<SysInfoParamStore> sysInfoParamStore;
+ 
+ static std::string sysInfoReadSystemName()
+@@ -1337,9 +1381,9 @@ static inline auto responseSetInProgressActive()
+ ipmi::RspType<uint8_t,                // Parameter revision
+               std::optional<uint8_t>, // data1 / setSelector / ProgressStatus
+               std::optional<std::vector<uint8_t>>> // data2-17
+-    ipmiAppGetSystemInfo(uint7_t reserved, bool getRevision,
+-                         uint8_t paramSelector, uint8_t setSelector,
+-                         uint8_t BlockSelector)
++    ipmiAppGetSystemInfo(ipmi::Context::ptr ctx, uint7_t reserved,
++                         bool getRevision, uint8_t paramSelector,
++                         uint8_t setSelector, uint8_t BlockSelector)
+ {
+     if (reserved || (paramSelector >= invalidParamSelectorStart &&
+                      paramSelector <= invalidParamSelectorEnd))
+@@ -1373,6 +1417,17 @@ ipmi::RspType<uint8_t,                // Parameter revision
+                                   sysInfoReadSystemName);
+     }
+ 
++    if (paramSelector == IPMI_SYSINFO_SYSTEM_FW_VERSION)
++    {
++        auto fwVersion = getSysFWVersion(ctx);
++
++        if (fwVersion == std::nullopt)
++        {
++            return ipmi::responseUnspecifiedError();
++        }
++        sysInfoParamStore->update(IPMI_SYSINFO_SYSTEM_FW_VERSION, *fwVersion);
++    }
++
+     // Parameters other than Set In Progress are assumed to be strings.
+     std::tuple<bool, std::string> ret =
+         sysInfoParamStore->lookup(paramSelector);
+@@ -1486,7 +1541,6 @@ ipmi::RspType<> ipmiAppSetSystemInfo(uint8_t paramSelector, uint8_t data1,
+         {
+             return ipmi::responseInvalidFieldRequest();
+         }
+-
+         size_t stringLen = configData.at(1); // string length
+         count = std::min(stringLen, smallChunkSize);
+         count = std::min(count, configData.size());
+@@ -1504,6 +1558,12 @@ ipmi::RspType<> ipmiAppSetSystemInfo(uint8_t paramSelector, uint8_t data1,
+         count = std::min(paramString.length() - offset, configData.size());
+         std::copy_n(configData.begin(), count, paramString.begin() + offset);
+     }
++
++    if (paramSelector == IPMI_SYSINFO_SYSTEM_FW_VERSION)
++    {
++        return ipmi::responseParmNotSupported();
++    }
++
+     sysInfoParamStore->update(paramSelector, paramString);
+     return ipmi::responseSuccess();
+ }
+-- 
+2.43.0
+
