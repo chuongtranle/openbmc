@@ -1,11 +1,18 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
-SRC_URI:append = " file://host_eid"
+RDEPENDS:${PN} += "bash libcper"
+
+SRC_URI = "git://github.com/ampere-openbmc/pldm;protocol=https;branch=ampere \
+           file://host_eid \
+          "
+SRCREV = "b64bd814800ec338ddec56d1c917bb80e7fcc499"
 
 SYSTEMD_SERVICE:${PN}:remove = " \
                                 pldmSoftPowerOff.service \
                                "
 SRC_URI:remove = "file://pldm-softpoweroff"
+
+PACKAGECONFIG:append = " oem-ampere"
 
 do_install:append() {
     install -d ${D}/${datadir}/pldm
