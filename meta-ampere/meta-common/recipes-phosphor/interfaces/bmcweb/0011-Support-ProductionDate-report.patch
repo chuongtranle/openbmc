@@ -1,0 +1,494 @@
+From 691491581f3e7434f4031c5c4fbc1a3f933bac3d Mon Sep 17 00:00:00 2001
+From: Hieu Huynh <hieuh@os.amperecomputing.com>
+Date: Thu, 11 Jul 2024 03:47:21 +0000
+Subject: [PATCH 11/12] Support ProductionDate report
+
+DSP0268 Redfish Data Model Specification provides ProductionDate
+property for various schema. phosphor-dbus-interface [1] also
+supports BuildDate property which we can map from FRU data, like
+`Board Manufacturer Date`.
+This adds code to support which gets the date from BuildDate
+property and report via Redfish.
+
+[1] https://github.com/openbmc/phosphor-dbus-interfaces/blob/master/yaml/xyz/openbmc_project/Inventory/Decorator/Asset.interface.yaml#L16
+
+Tested:
+1. GET /redfish/v1/Managers/bmc
+   "ProductionDate": "2023-05-31T00:00:00Z"
+2. GET /redfish/v1/Chassis/chassis_id
+   "ProductionDate": "2023-05-31T00:00:00Z"
+
+Signed-off-by: Hieu Huynh <hieuh@os.amperecomputing.com>
+Change-Id: Ie4ae564fa00218e7896f04ec61941fa92b23b912
+---
+ redfish-core/lib/chassis.hpp         | 24 +++++++++++++++++++++++-
+ redfish-core/lib/fabric_adapters.hpp | 23 ++++++++++++++++++++++-
+ redfish-core/lib/fan.hpp             | 23 ++++++++++++++++++++++-
+ redfish-core/lib/managers.hpp        | 25 ++++++++++++++++++++++++-
+ redfish-core/lib/pcie.hpp            | 24 +++++++++++++++++++++++-
+ redfish-core/lib/power_supply.hpp    | 24 +++++++++++++++++++++++-
+ redfish-core/lib/processor.hpp       | 24 +++++++++++++++++++++++-
+ redfish-core/lib/sensors.hpp         | 26 ++++++++++++++++++++++++++
+ redfish-core/lib/storage.hpp         | 23 ++++++++++++++++++++++-
+ redfish-core/lib/systems.hpp         | 23 ++++++++++++++++++++++-
+ 10 files changed, 230 insertions(+), 9 deletions(-)
+
+diff --git a/redfish-core/lib/chassis.hpp b/redfish-core/lib/chassis.hpp
+index 52cdc98a..b9b542d8 100644
+--- a/redfish-core/lib/chassis.hpp
++++ b/redfish-core/lib/chassis.hpp
+@@ -484,11 +484,13 @@ inline void handleDecoratorAssetProperties(
+     const std::string* manufacturer = nullptr;
+     const std::string* model = nullptr;
+     const std::string* sparePartNumber = nullptr;
++    const std::string* buildDate = nullptr;
+ 
+     const bool success = sdbusplus::unpackPropertiesNoThrow(
+         dbus_utils::UnpackErrorPrinter(), propertiesList, "PartNumber",
+         partNumber, "SerialNumber", serialNumber, "Manufacturer", manufacturer,
+-        "Model", model, "SparePartNumber", sparePartNumber);
++        "Model", model, "SparePartNumber", sparePartNumber, "BuildDate",
++        buildDate);
+ 
+     if (!success)
+     {
+@@ -523,6 +525,26 @@ inline void handleDecoratorAssetProperties(
+         asyncResp->res.jsonValue["SparePartNumber"] = *sparePartNumber;
+     }
+ 
++    if (buildDate != nullptr)
++    {
++        // The date of item manufacture in ISO 8601 format, either as YYYYMMDD
++        // or YYYYMMDDThhmmssZ
++        std::string valueStr = *buildDate;
++        if (valueStr.size() == 8)
++        {
++            valueStr.insert(4, 1, '-');
++            valueStr.insert(7, 1, '-');
++        }
++        if (valueStr.size() == 16)
++        {
++            valueStr.insert(4, 1, '-');
++            valueStr.insert(7, 1, '-');
++            valueStr.insert(13, 1, ':');
++            valueStr.insert(16, 1, ':');
++        }
++        asyncResp->res.jsonValue["ProductionDate"] = valueStr;
++    }
++
+     asyncResp->res.jsonValue["Name"] = chassisId;
+     asyncResp->res.jsonValue["Id"] = chassisId;
+ 
+diff --git a/redfish-core/lib/fabric_adapters.hpp b/redfish-core/lib/fabric_adapters.hpp
+index c7bdbb75..6442a338 100644
+--- a/redfish-core/lib/fabric_adapters.hpp
++++ b/redfish-core/lib/fabric_adapters.hpp
+@@ -73,11 +73,12 @@ inline void
+         const std::string* model = nullptr;
+         const std::string* partNumber = nullptr;
+         const std::string* sparePartNumber = nullptr;
++        const std::string* buildDate = nullptr;
+ 
+         const bool success = sdbusplus::unpackPropertiesNoThrow(
+             dbus_utils::UnpackErrorPrinter(), propertiesList, "SerialNumber",
+             serialNumber, "Model", model, "PartNumber", partNumber,
+-            "SparePartNumber", sparePartNumber);
++            "SparePartNumber", sparePartNumber, "BuildDate", buildDate);
+ 
+         if (!success)
+         {
+@@ -104,6 +105,26 @@ inline void
+         {
+             asyncResp->res.jsonValue["SparePartNumber"] = *sparePartNumber;
+         }
++
++        if (buildDate != nullptr)
++        {
++            // The date of item manufacture in ISO 8601 format, either as
++            // YYYYMMDD or YYYYMMDDThhmmssZ
++            std::string valueStr = *buildDate;
++            if (valueStr.size() == 8)
++            {
++                valueStr.insert(4, 1, '-');
++                valueStr.insert(7, 1, '-');
++            }
++            if (valueStr.size() == 16)
++            {
++                valueStr.insert(4, 1, '-');
++                valueStr.insert(7, 1, '-');
++                valueStr.insert(13, 1, ':');
++                valueStr.insert(16, 1, ':');
++            }
++            asyncResp->res.jsonValue["ProductionDate"] = valueStr;
++        }
+     });
+ }
+ 
+diff --git a/redfish-core/lib/fan.hpp b/redfish-core/lib/fan.hpp
+index 7245287f..65f6b46f 100644
+--- a/redfish-core/lib/fan.hpp
++++ b/redfish-core/lib/fan.hpp
+@@ -305,11 +305,13 @@ inline void getFanAsset(const std::shared_ptr<bmcweb::AsyncResp>& asyncResp,
+         const std::string* partNumber = nullptr;
+         const std::string* serialNumber = nullptr;
+         const std::string* sparePartNumber = nullptr;
++        const std::string* buildDate = nullptr;
+ 
+         const bool success = sdbusplus::unpackPropertiesNoThrow(
+             dbus_utils::UnpackErrorPrinter(), assetList, "Manufacturer",
+             manufacturer, "Model", model, "PartNumber", partNumber,
+-            "SerialNumber", serialNumber, "SparePartNumber", sparePartNumber);
++            "SerialNumber", serialNumber, "SparePartNumber", sparePartNumber,
++            "BuildDate", buildDate);
+         if (!success)
+         {
+             messages::internalError(asyncResp->res);
+@@ -335,6 +337,25 @@ inline void getFanAsset(const std::shared_ptr<bmcweb::AsyncResp>& asyncResp,
+         {
+             asyncResp->res.jsonValue["SparePartNumber"] = *sparePartNumber;
+         }
++        if (buildDate != nullptr)
++        {
++            // The date of item manufacture in ISO 8601 format, either as
++            // YYYYMMDD or YYYYMMDDThhmmssZ
++            std::string valueStr = *buildDate;
++            if (valueStr.size() == 8)
++            {
++                valueStr.insert(4, 1, '-');
++                valueStr.insert(7, 1, '-');
++            }
++            if (valueStr.size() == 16)
++            {
++                valueStr.insert(4, 1, '-');
++                valueStr.insert(7, 1, '-');
++                valueStr.insert(13, 1, ':');
++                valueStr.insert(16, 1, ':');
++            }
++            asyncResp->res.jsonValue["ProductionDate"] = valueStr;
++        }
+     });
+ }
+ 
+diff --git a/redfish-core/lib/managers.hpp b/redfish-core/lib/managers.hpp
+index 745ba5fa..0485a4e9 100644
+--- a/redfish-core/lib/managers.hpp
++++ b/redfish-core/lib/managers.hpp
+@@ -2201,12 +2201,14 @@ inline void requestRoutesManager(App& app)
+                         const std::string* manufacturer = nullptr;
+                         const std::string* model = nullptr;
+                         const std::string* sparePartNumber = nullptr;
++                        const std::string* buildDate = nullptr;
+ 
+                         const bool success = sdbusplus::unpackPropertiesNoThrow(
+                             dbus_utils::UnpackErrorPrinter(), propertiesList,
+                             "PartNumber", partNumber, "SerialNumber",
+                             serialNumber, "Manufacturer", manufacturer, "Model",
+-                            model, "SparePartNumber", sparePartNumber);
++                            model, "SparePartNumber", sparePartNumber,
++                            "BuildDate", buildDate);
+ 
+                         if (!success)
+                         {
+@@ -2242,6 +2244,27 @@ inline void requestRoutesManager(App& app)
+                             asyncResp->res.jsonValue["SparePartNumber"] =
+                                 *sparePartNumber;
+                         }
++
++                        if (buildDate != nullptr)
++                        {
++                            // The date of item manufacture in ISO 8601 format,
++                            // either as YYYYMMDD or YYYYMMDDThhmmssZ
++                            std::string valueStr = *buildDate;
++                            if (valueStr.size() == 8)
++                            {
++                                valueStr.insert(4, 1, '-');
++                                valueStr.insert(7, 1, '-');
++                            }
++                            if (valueStr.size() == 16)
++                            {
++                                valueStr.insert(4, 1, '-');
++                                valueStr.insert(7, 1, '-');
++                                valueStr.insert(13, 1, ':');
++                                valueStr.insert(16, 1, ':');
++                            }
++                            asyncResp->res.jsonValue["ProductionDate"] =
++                                valueStr;
++                        }
+                     });
+                 }
+                 else if (interfaceName ==
+diff --git a/redfish-core/lib/pcie.hpp b/redfish-core/lib/pcie.hpp
+index d896f6dc..b47d6d9f 100644
+--- a/redfish-core/lib/pcie.hpp
++++ b/redfish-core/lib/pcie.hpp
+@@ -377,11 +377,13 @@ inline void
+         const std::string* partNumber = nullptr;
+         const std::string* serialNumber = nullptr;
+         const std::string* sparePartNumber = nullptr;
++        const std::string* buildDate = nullptr;
+ 
+         const bool success = sdbusplus::unpackPropertiesNoThrow(
+             dbus_utils::UnpackErrorPrinter(), assetList, "Manufacturer",
+             manufacturer, "Model", model, "PartNumber", partNumber,
+-            "SerialNumber", serialNumber, "SparePartNumber", sparePartNumber);
++            "SerialNumber", serialNumber, "SparePartNumber", sparePartNumber,
++            "BuildDate", buildDate);
+ 
+         if (!success)
+         {
+@@ -412,6 +414,26 @@ inline void
+         {
+             asyncResp->res.jsonValue["SparePartNumber"] = *sparePartNumber;
+         }
++
++        if (buildDate != nullptr)
++        {
++            // The date of item manufacture in ISO 8601 format, either as
++            // YYYYMMDD or YYYYMMDDThhmmssZ
++            std::string valueStr = *buildDate;
++            if (valueStr.size() == 8)
++            {
++                valueStr.insert(4, 1, '-');
++                valueStr.insert(7, 1, '-');
++            }
++            if (valueStr.size() == 16)
++            {
++                valueStr.insert(4, 1, '-');
++                valueStr.insert(7, 1, '-');
++                valueStr.insert(13, 1, ':');
++                valueStr.insert(16, 1, ':');
++            }
++            asyncResp->res.jsonValue["ProductionDate"] = valueStr;
++        }
+     });
+ }
+ 
+diff --git a/redfish-core/lib/power_supply.hpp b/redfish-core/lib/power_supply.hpp
+index 31cd1f9a..89a2dcd5 100644
+--- a/redfish-core/lib/power_supply.hpp
++++ b/redfish-core/lib/power_supply.hpp
+@@ -281,11 +281,13 @@ inline void
+         const std::string* manufacturer = nullptr;
+         const std::string* model = nullptr;
+         const std::string* sparePartNumber = nullptr;
++        const std::string* buildDate = nullptr;
+ 
+         const bool success = sdbusplus::unpackPropertiesNoThrow(
+             dbus_utils::UnpackErrorPrinter(), propertiesList, "PartNumber",
+             partNumber, "SerialNumber", serialNumber, "Manufacturer",
+-            manufacturer, "Model", model, "SparePartNumber", sparePartNumber);
++            manufacturer, "Model", model, "SparePartNumber", sparePartNumber,
++            "BuildDate", buildDate);
+ 
+         if (!success)
+         {
+@@ -318,6 +320,26 @@ inline void
+         {
+             asyncResp->res.jsonValue["SparePartNumber"] = *sparePartNumber;
+         }
++
++        if (buildDate != nullptr)
++        {
++            // The date of item manufacture in ISO 8601 format, either as
++            // YYYYMMDD or YYYYMMDDThhmmssZ
++            std::string valueStr = *buildDate;
++            if (valueStr.size() == 8)
++            {
++                valueStr.insert(4, 1, '-');
++                valueStr.insert(7, 1, '-');
++            }
++            if (valueStr.size() == 16)
++            {
++                valueStr.insert(4, 1, '-');
++                valueStr.insert(7, 1, '-');
++                valueStr.insert(13, 1, ':');
++                valueStr.insert(16, 1, ':');
++            }
++            asyncResp->res.jsonValue["ProductionDate"] = valueStr;
++        }
+     });
+ }
+ 
+diff --git a/redfish-core/lib/processor.hpp b/redfish-core/lib/processor.hpp
+index b49f13b1..e3047534 100644
+--- a/redfish-core/lib/processor.hpp
++++ b/redfish-core/lib/processor.hpp
+@@ -409,11 +409,13 @@ inline void getCpuAssetData(std::shared_ptr<bmcweb::AsyncResp> asyncResp,
+         const std::string* manufacturer = nullptr;
+         const std::string* partNumber = nullptr;
+         const std::string* sparePartNumber = nullptr;
++        const std::string* buildDate = nullptr;
+ 
+         const bool success = sdbusplus::unpackPropertiesNoThrow(
+             dbus_utils::UnpackErrorPrinter(), properties, "SerialNumber",
+             serialNumber, "Model", model, "Manufacturer", manufacturer,
+-            "PartNumber", partNumber, "SparePartNumber", sparePartNumber);
++            "PartNumber", partNumber, "SparePartNumber", sparePartNumber,
++            "BuildDate", buildDate);
+ 
+         if (!success)
+         {
+@@ -457,6 +459,26 @@ inline void getCpuAssetData(std::shared_ptr<bmcweb::AsyncResp> asyncResp,
+         {
+             asyncResp->res.jsonValue["SparePartNumber"] = *sparePartNumber;
+         }
++
++        if (buildDate != nullptr)
++        {
++            // The date of item manufacture in ISO 8601 format, either as
++            // YYYYMMDD or YYYYMMDDThhmmssZ
++            std::string valueStr = *buildDate;
++            if (valueStr.size() == 8)
++            {
++                valueStr.insert(4, 1, '-');
++                valueStr.insert(7, 1, '-');
++            }
++            if (valueStr.size() == 16)
++            {
++                valueStr.insert(4, 1, '-');
++                valueStr.insert(7, 1, '-');
++                valueStr.insert(13, 1, ':');
++                valueStr.insert(16, 1, ':');
++            }
++            asyncResp->res.jsonValue["ProductionDate"] = valueStr;
++        }
+     });
+ }
+ 
+diff --git a/redfish-core/lib/sensors.hpp b/redfish-core/lib/sensors.hpp
+index 228fae04..5e786dda 100644
+--- a/redfish-core/lib/sensors.hpp
++++ b/redfish-core/lib/sensors.hpp
+@@ -347,6 +347,7 @@ class InventoryItem
+     std::string model;
+     std::string partNumber;
+     std::string serialNumber;
++    std::string buildDate;
+     std::set<std::string> sensors;
+     std::string ledObjectPath;
+     LedState ledState = LedState::UNKNOWN;
+@@ -1406,6 +1407,31 @@ inline void storeInventoryItemData(
+                         inventoryItem.partNumber = *value;
+                     }
+                 }
++
++                if (name == "BuildDate")
++                {
++                    const std::string* value =
++                        std::get_if<std::string>(&dbusValue);
++                    // The date of item manufacture in ISO 8601 format, either
++                    // as YYYYMMDD or YYYYMMDDThhmmssZ
++                    std::string valueStr = *value;
++                    if (valueStr.size() == 8)
++                    {
++                        valueStr.insert(4, 1, '-');
++                        valueStr.insert(7, 1, '-');
++                    }
++                    if (valueStr.size() == 16)
++                    {
++                        valueStr.insert(4, 1, '-');
++                        valueStr.insert(7, 1, '-');
++                        valueStr.insert(13, 1, ':');
++                        valueStr.insert(16, 1, ':');
++                    }
++                    if (!valueStr.empty())
++                    {
++                        inventoryItem.buildDate = valueStr;
++                    }
++                }
+             }
+         }
+ 
+diff --git a/redfish-core/lib/storage.hpp b/redfish-core/lib/storage.hpp
+index cb5e752a..451621b5 100644
+--- a/redfish-core/lib/storage.hpp
++++ b/redfish-core/lib/storage.hpp
+@@ -309,11 +309,12 @@ inline void getDriveAsset(const std::shared_ptr<bmcweb::AsyncResp>& asyncResp,
+         const std::string* serialNumber = nullptr;
+         const std::string* manufacturer = nullptr;
+         const std::string* model = nullptr;
++        const std::string* buildDate = nullptr;
+ 
+         const bool success = sdbusplus::unpackPropertiesNoThrow(
+             dbus_utils::UnpackErrorPrinter(), propertiesList, "PartNumber",
+             partNumber, "SerialNumber", serialNumber, "Manufacturer",
+-            manufacturer, "Model", model);
++            manufacturer, "Model", model, "BuildDate", buildDate);
+ 
+         if (!success)
+         {
+@@ -340,6 +341,26 @@ inline void getDriveAsset(const std::shared_ptr<bmcweb::AsyncResp>& asyncResp,
+         {
+             asyncResp->res.jsonValue["Model"] = *model;
+         }
++
++        if (buildDate != nullptr)
++        {
++            // The date of item manufacture in ISO 8601 format, either as
++            // YYYYMMDD or YYYYMMDDThhmmssZ
++            std::string valueStr = *buildDate;
++            if (valueStr.size() == 8)
++            {
++                valueStr.insert(4, 1, '-');
++                valueStr.insert(7, 1, '-');
++            }
++            if (valueStr.size() == 16)
++            {
++                valueStr.insert(4, 1, '-');
++                valueStr.insert(7, 1, '-');
++                valueStr.insert(13, 1, ':');
++                valueStr.insert(16, 1, ':');
++            }
++            asyncResp->res.jsonValue["ProductionDate"] = valueStr;
++        }
+     });
+ }
+ 
+diff --git a/redfish-core/lib/systems.hpp b/redfish-core/lib/systems.hpp
+index cceae43a..7cfdd145 100644
+--- a/redfish-core/lib/systems.hpp
++++ b/redfish-core/lib/systems.hpp
+@@ -363,11 +363,12 @@ inline void
+     const std::string* manufacturer = nullptr;
+     const std::string* model = nullptr;
+     const std::string* subModel = nullptr;
++    const std::string* buildDate = nullptr;
+ 
+     const bool success = sdbusplus::unpackPropertiesNoThrow(
+         dbus_utils::UnpackErrorPrinter(), propertiesList, "PartNumber",
+         partNumber, "SerialNumber", serialNumber, "Manufacturer", manufacturer,
+-        "Model", model, "SubModel", subModel);
++        "Model", model, "SubModel", subModel, "BuildDate", buildDate);
+ 
+     if (!success)
+     {
+@@ -400,6 +401,26 @@ inline void
+         asyncResp->res.jsonValue["SubModel"] = *subModel;
+     }
+ 
++    if (buildDate != nullptr)
++    {
++        // The date of item manufacture in ISO 8601 format, either as YYYYMMDD
++        // or YYYYMMDDThhmmssZ
++        std::string valueStr = *buildDate;
++        if (valueStr.size() == 8)
++        {
++            valueStr.insert(4, 1, '-');
++            valueStr.insert(7, 1, '-');
++        }
++        if (valueStr.size() == 16)
++        {
++            valueStr.insert(4, 1, '-');
++            valueStr.insert(7, 1, '-');
++            valueStr.insert(13, 1, ':');
++            valueStr.insert(16, 1, ':');
++        }
++        asyncResp->res.jsonValue["ProductionDate"] = valueStr;
++    }
++
+     // Grab the bios version
+     sw_util::populateSoftwareInformation(asyncResp, sw_util::biosPurpose,
+                                          "BiosVersion", false);
+-- 
+2.34.1
+

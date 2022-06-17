@@ -1,0 +1,31 @@
+From 8f4bf7f460f115327db3055cf61ee25a60cc75a7 Mon Sep 17 00:00:00 2001
+From: Hieu Huynh <hieuh@os.amperecomputing.com>
+Date: Tue, 8 Oct 2024 03:02:22 +0000
+Subject: [PATCH] Increase TaskTimer in Update Service
+
+The update service timer is set by bmcweb to begin at five minutes.
+Using Webui/Refish to update the CPLD on Jefferson took longer than
+5 minutes. To address the issue, increases the timer to 15 minutes.
+
+Signed-off-by: Hieu Huynh <hieuh@os.amperecomputing.com>
+Change-Id: I550f7e1f724028832a391b476207ad0c227b7753
+---
+ redfish-core/lib/update_service.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/redfish-core/lib/update_service.hpp b/redfish-core/lib/update_service.hpp
+index f44615df..fe467bf5 100644
+--- a/redfish-core/lib/update_service.hpp
++++ b/redfish-core/lib/update_service.hpp
+@@ -217,7 +217,7 @@ inline bool handleCreateTask(const boost::system::error_code& ec2,
+ 
+         // if we're getting status updates it's
+         // still alive, update timer
+-        taskData->extendTimer(std::chrono::minutes(5));
++        taskData->extendTimer(std::chrono::minutes(10));
+     }
+ 
+     // as firmware update often results in a
+-- 
+2.25.1
+

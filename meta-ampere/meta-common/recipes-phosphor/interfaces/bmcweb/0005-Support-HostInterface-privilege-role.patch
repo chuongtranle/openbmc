@@ -1,0 +1,45 @@
+From 800c95ae8cfedd1b94b4a5fb1e6eab485894bf0c Mon Sep 17 00:00:00 2001
+From: Hieu Huynh <hieuh@os.amperecomputing.com>
+Date: Fri, 12 May 2023 10:31:24 +0700
+Subject: [PATCH 05/12] Support HostInterface privilege role
+
+This commit supports the CredentialBootstrappingRole property inside
+HostInterface schema. This property shall contain a link to a resource
+of type Role, and should link to the resource identified by the RoleId
+property within CredentialBootstrapping.
+
+Signed-off-by: Hieu Huynh <hieuh@os.amperecomputing.com>
+---
+ redfish-core/lib/roles.hpp | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/redfish-core/lib/roles.hpp b/redfish-core/lib/roles.hpp
+index a0f4f347..679d655d 100644
+--- a/redfish-core/lib/roles.hpp
++++ b/redfish-core/lib/roles.hpp
+@@ -36,6 +36,10 @@ inline std::string getRoleFromPrivileges(std::string_view priv)
+     {
+         return "Administrator";
+     }
++    if (priv == "priv-hostinterfaceadmin")
++    {
++        return "HostInterfaceAdministrator";
++    }
+     if (priv == "priv-user")
+     {
+         return "ReadOnly";
+@@ -59,6 +63,11 @@ inline std::optional<nlohmann::json::array_t>
+         privArray.emplace_back("ConfigureSelf");
+         privArray.emplace_back("ConfigureComponents");
+     }
++    else if (role == "HostInterfaceAdministrator")
++    {
++        privArray = {"Login", "ConfigureManager", "ConfigureUsers",
++                     "ConfigureSelf", "ConfigureComponents"};
++    }
+     else if (role == "Operator")
+     {
+         privArray.emplace_back("Login");
+-- 
+2.34.1
+
