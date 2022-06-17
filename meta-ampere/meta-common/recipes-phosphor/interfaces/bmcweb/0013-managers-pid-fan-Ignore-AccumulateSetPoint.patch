@@ -1,0 +1,30 @@
+From f39f57708d9eb3e5c258387f83d5eb34c55ebd2d Mon Sep 17 00:00:00 2001
+From: Chau Ly <chaul@amperecomputing.com>
+Date: Tue, 17 Sep 2024 13:34:36 +0700
+Subject: [PATCH 13/13] managers: pid fan: Ignore AccumulateSetPoint
+
+Add AccumulateSetPoint to the skip list of FanZones in
+/redfish/v1/Managers/bmc/Oem/OpenBmc/Fan/FanZones.
+
+Signed-off-by: Chau Ly <chaul@amperecomputing.com>
+---
+ redfish-core/lib/managers.hpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/redfish-core/lib/managers.hpp b/redfish-core/lib/managers.hpp
+index 1bcab3ec..65e4eee6 100644
+--- a/redfish-core/lib/managers.hpp
++++ b/redfish-core/lib/managers.hpp
+@@ -539,7 +539,8 @@ inline void
+                     {
+                         if (propertyPair.first == "Type" ||
+                             propertyPair.first == "Class" ||
+-                            propertyPair.first == "Name")
++                            propertyPair.first == "Name" ||
++                            propertyPair.first == "AccumulateSetPoint")
+                         {
+                             continue;
+                         }
+-- 
+2.43.0
+

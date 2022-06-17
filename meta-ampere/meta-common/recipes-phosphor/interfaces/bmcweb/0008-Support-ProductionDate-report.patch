@@ -1,0 +1,155 @@
+From e2f23c1dcb1f53dc83461efdcd560e1c6213d7b1 Mon Sep 17 00:00:00 2001
+From: Hieu Huynh <hieuh@os.amperecomputing.com>
+Date: Thu, 11 Jul 2024 03:47:21 +0000
+Subject: [PATCH 08/13] Support ProductionDate report
+
+DSP0268 Redfish Data Model Specification provides ProductionDate
+property for various schema. phosphor-dbus-interface [1] also
+supports BuildDate property which we can map from FRU data, like
+`Board Manufacturer Date`.
+This adds code to support which gets the date from BuildDate
+property and report via Redfish.
+
+[1] https://github.com/openbmc/phosphor-dbus-interfaces/blob/master/yaml/xyz/openbmc_project/Inventory/Decorator/Asset.interface.yaml#L16
+
+Tested: Redfish Validator passes
+
+Signed-off-by: Hieu Huynh <hieuh@os.amperecomputing.com>
+Change-Id: Ie4ae564fa00218e7896f04ec61941fa92b23b912
+---
+ redfish-core/include/utils/time_utils.hpp     | 52 +++++++++++++++++++
+ redfish-core/lib/power_supply.hpp             |  9 +++-
+ .../include/utils/time_utils_test.cpp         | 10 ++++
+ 3 files changed, 70 insertions(+), 1 deletion(-)
+
+diff --git a/redfish-core/include/utils/time_utils.hpp b/redfish-core/include/utils/time_utils.hpp
+index fbcd39e9..338cb44a 100644
+--- a/redfish-core/include/utils/time_utils.hpp
++++ b/redfish-core/include/utils/time_utils.hpp
+@@ -1,5 +1,6 @@
+ #pragma once
+ 
++#include "app.hpp"
+ #include "logging.hpp"
+ 
+ #include <algorithm>
+@@ -375,6 +376,57 @@ inline std::pair<std::string, std::string> getDateTimeOffsetNow()
+     return std::make_pair(dateTime, timeOffset);
+ }
+ 
++/**
++ * @brief Returns the datetime in ISO 8601 format
++ *
++ * @param[in] std::string_view the date of item manufacture in ISO 8601 format,
++ *            either as YYYYMMDD or YYYYMMDDThhmmssZ
++ * Ref: https://github.com/openbmc/phosphor-dbus-interfaces/blob/master/yaml/
++ *      xyz/openbmc_project/Inventory/Decorator/Asset.interface.yaml#L16
++ *
++ * @return std::string which consist the datetime
++ */
++inline std::optional<std::string> getDateTimeIso8601(std::string_view datetime)
++{
++    std::string datetimeStr = std::string{datetime};
++    if ((datetimeStr.size() != 8) && (datetimeStr.size() != 16))
++    {
++        return std::nullopt;
++    }
++
++    if (datetimeStr.size() == 8)
++    {
++        datetimeStr.insert(4, 1, '-');
++        datetimeStr.insert(7, 1, '-');
++    }
++    else
++    {
++        datetimeStr.insert(4, 1, '-');
++        datetimeStr.insert(7, 1, '-');
++        datetimeStr.insert(13, 1, ':');
++        datetimeStr.insert(16, 1, ':');
++    }
++
++    return std::make_optional(datetimeStr);
++}
++
++/**
++ * @brief ProductionDate report
++ */
++inline void
++    productionDateReport(const std::shared_ptr<bmcweb::AsyncResp>& asyncResp,
++                         const std::string* buildDate)
++{
++    std::optional<std::string> valueStr =
++        redfish::time_utils::getDateTimeIso8601(*buildDate);
++    if (!valueStr)
++    {
++        messages::internalError(asyncResp->res);
++        return;
++    }
++    asyncResp->res.jsonValue["ProductionDate"] = *valueStr;
++}
++
+ using usSinceEpoch = std::chrono::duration<int64_t, std::micro>;
+ std::optional<usSinceEpoch> dateStringToEpoch(std::string_view datetime);
+ } // namespace time_utils
+diff --git a/redfish-core/lib/power_supply.hpp b/redfish-core/lib/power_supply.hpp
+index 7905885c..ea2b8726 100644
+--- a/redfish-core/lib/power_supply.hpp
++++ b/redfish-core/lib/power_supply.hpp
+@@ -8,6 +8,7 @@
+ #include "utils/chassis_utils.hpp"
+ #include "utils/dbus_utils.hpp"
+ #include "utils/json_utils.hpp"
++#include "utils/time_utils.hpp"
+ 
+ #include <boost/system/error_code.hpp>
+ #include <boost/url/format.hpp>
+@@ -282,12 +283,13 @@ inline void
+             const std::string* manufacturer = nullptr;
+             const std::string* model = nullptr;
+             const std::string* sparePartNumber = nullptr;
++            const std::string* buildDate = nullptr;
+ 
+             const bool success = sdbusplus::unpackPropertiesNoThrow(
+                 dbus_utils::UnpackErrorPrinter(), propertiesList, "PartNumber",
+                 partNumber, "SerialNumber", serialNumber, "Manufacturer",
+                 manufacturer, "Model", model, "SparePartNumber",
+-                sparePartNumber);
++                sparePartNumber, "BuildDate", buildDate);
+ 
+             if (!success)
+             {
+@@ -320,6 +322,11 @@ inline void
+             {
+                 asyncResp->res.jsonValue["SparePartNumber"] = *sparePartNumber;
+             }
++
++            if (buildDate != nullptr)
++            {
++                redfish::time_utils::productionDateReport(asyncResp, buildDate);
++            }
+         });
+ }
+ 
+diff --git a/test/redfish-core/include/utils/time_utils_test.cpp b/test/redfish-core/include/utils/time_utils_test.cpp
+index ca11097a..c9ea5cd2 100644
+--- a/test/redfish-core/include/utils/time_utils_test.cpp
++++ b/test/redfish-core/include/utils/time_utils_test.cpp
+@@ -205,5 +205,15 @@ TEST(Utility, DateStringToEpochWithInvalidDateTimeFormats)
+     EXPECT_EQ(dateStringToEpoch("2024-07-01T12:00:00X"), std::nullopt);
+ }
+ 
++TEST(Utility, GetDateTimeIso8601)
++{
++    EXPECT_EQ(getDateTimeIso8601("20230531"), "2023-05-31");
++
++    EXPECT_EQ(getDateTimeIso8601("20230531T000000Z"), "2023-05-31T00:00:00Z");
++
++    // invalid datetime
++    EXPECT_EQ(getDateTimeIso8601("202305"), std::nullopt);
++}
++
+ } // namespace
+ } // namespace redfish::time_utils
+-- 
+2.43.0
+
