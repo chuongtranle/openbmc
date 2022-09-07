@@ -1,0 +1,47 @@
+From 5159e00ad228c4a1ff7f54c4201fd19fa5353854 Mon Sep 17 00:00:00 2001
+From: jason westover <jwestover@nvidia.com>
+Date: Thu, 12 Sep 2024 17:18:59 -0500
+Subject: [PATCH] Add default Target to MultipartHttpPush
+
+When no targets are provided, webui will now default to the BMC:
+i.e. "/redfish/v1/Managers/bmc"
+
+The current version of bmcweb requires the Targets parameter.
+bmcweb will be updated for multipart to match the behavior of
+simpleupdate:
+if Targets is empty or missing, default to the BMC.
+
+Also, the fwupdate page will be updated soon to allow the
+selection of Targets from the FirmwareInventory list.
+
+This should be a temp webui fix until we are comfortable with
+the upcoming changes to bmcweb.
+
+Change-Id: I630dcb40068b98aad8e1d276d17fe9af4793e788
+Signed-off-by: jason westover <jwestover@nvidia.com>
+---
+ src/store/modules/Operations/FirmwareStore.js | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/src/store/modules/Operations/FirmwareStore.js b/src/store/modules/Operations/FirmwareStore.js
+index 6c216da..64bd640 100644
+--- a/src/store/modules/Operations/FirmwareStore.js
++++ b/src/store/modules/Operations/FirmwareStore.js
+@@ -141,7 +141,13 @@ const FirmwareStore = {
+       const formData = new FormData();
+       formData.append('UpdateFile', image);
+       let params = {};
+-      if (targets != null && targets.length > 0) params.Targets = targets;
++      if (targets != null && targets.length > 0) {
++        params.Targets = targets;
++      } else {
++        // TODO: Should be OK to leave Targets out, remove this clause
++        // when bmcweb is updated
++        params.Targets = [`${await this.dispatch('global/getBmcPath')}`];
++      }
+       formData.append('UpdateParameters', JSON.stringify(params));
+       return await api
+         .post(state.multipartHttpPushUri, formData, {
+-- 
+2.25.1
+
