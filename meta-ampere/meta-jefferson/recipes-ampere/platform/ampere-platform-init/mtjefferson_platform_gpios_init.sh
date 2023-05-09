@@ -1,0 +1,134 @@
+#!/bin/bash
+
+# shellcheck disable=SC2154
+# shellcheck disable=SC2046
+# shellcheck source=meta-ampere/meta-jefferson/recipes-ampere/platform/ampere-utils/ampere_fanctrl.sh
+source /usr/sbin/ampere_fanctrl.sh
+
+
+function bind_rtc_driver() {
+    # If rtc device can not present, bind the device
+    if [[ ! -e /dev/rtc0 ]]; then
+        echo "Bind rtc driver"
+        echo 6-0051 > /sys/bus/i2c/drivers/rtc-pcf8563/bind
+    fi
+}
+
+function pre-platform-init() {
+    echo "Do pre platform init"
+}
+
+function post-platform-init() {
+
+    # When BMC is rebooted, because PSON_L has pull up to P3V3_STB, it changes its
+    # value to HIGH. Add code to check P3V3_STB and recover PSON_L to correct state
+    # before setting BMC_RDY.
+    pgood=$(gpioget $(gpiofind power-chassis-good))
+
+    if [ "$pgood" == '1' ]; then
+        echo "PSU is on. Setting PSON to 0"
+        gpioset $(gpiofind power-chassis-control)=0
+    else
+        echo "PSU is off. Setting PSON to 1"
+        gpioset $(gpiofind power-chassis-control)=1
+    fi
+    
+    gpioset $(gpiofind host0-sysreset-n)=1
+
+    fan_controller_init
+    echo "Set default FAN speed to 60%"
+    for filename in /sys/class/hwmon/*/pwm[0-9]
+    do
+        echo 153 > "$filename"
+    done
+
+    # Bind rtc driver
+    bind_rtc_driver
+}
+
+export output_high_gpios_in_ac=(
+    # add device enable, mux setting, device select gpios
+    "i2c2-reset-n"
+    "i2c6-reset-n"
+    "i2c5-reset-n"
+    "spi0-backup-sel"
+)
+
+export output_low_gpios_in_ac=(
+    # add device enable, mux setting, device select gpios
+    "spi0-program-sel"
+    "led-fp-sta-gr"
+    "led-fault"
+)
+
+export input_gpios_in_ac=(
+    # add device enable, mux setting, device select gpios
+)
+
+export output_high_gpios_in_bmc_reboot=(
+    "host0-sysreset-n"
+    "host0-pmin-n"
+    "bmc-debug-mode"
+    "vrd-sel"
+    "spd-sel"
+    "ext-high-temp-n"
+    "jtag-program-sel"
+    "wd-disable-n"
+    "hpm-stby-rst-n"
+    "jtag-sel-s0"
+    "user-mode"
+    "jtag-srst-n"
+    "host0-shd-req-n"
+    "vrd-prg-en-n"
+    "emmc-rst-n"
+    "s01-uart1-sel"
+    "eth-phy-rst-n"
+)
+
+export output_low_gpios_in_bmc_reboot=(
+    "led-fp-sta-amb"
+    "jtag-cmpl2"
+    "rtc-battery-voltage-read-enable"
+    "s0-rtc-lock"
+    "hpm-fw-recovery"
+    "led-fault"
+    "led-identify"
+    "spi-nor-access"
+    "host0-special-boot"
+    "cpu-bios-recover"
+    "bp-cpld-program-en"
+)
+
+export input_gpios_in_bmc_reboot=(
+    "chassis-id-sel"
+    "s0-vrd-fault-n"
+    "hsc-12vmain-alt2-n"
+    "reset-button"
+    "eth-phy-int-n"
+    "s0-pcp-oc-warn-n"
+    "s0-heartbeat"
+    "hs-scout-proc-hot"
+    "s0-vr-hot-n"
+    "hsc-12vmain-alt1-n"
+    "power-chassis-good"
+    "power-button"
+    "s0-ddr-save"
+    "soc-spi-nor-access"
+    "jtag-dbgr-prsnt-n"
+    "ps0-ac-loss-n"
+    "ps1-ac-loss-n"
+    "identify-button"
+    "s0-fw-boot-ok"
+    "s0-hightemp-n"
+    "s0-fault-alert"
+    "s0-sys-auth-failure-n"
+    "host0-reboot-ack-n"
+    "host0-ready"
+    "host0-shd-ack-n"
+    "s0-overtemp-n"
+    "vga-ft-press-n"
+    "nmi-n"
+    "cpld-3v3-irq-n"
+    "cpu-bios-recover"
+    "bp-cpld-program-en"
+)
