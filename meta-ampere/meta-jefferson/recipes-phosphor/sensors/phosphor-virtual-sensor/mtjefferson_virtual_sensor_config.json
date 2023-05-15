@@ -1,0 +1,57 @@
+[
+    {
+        "Desc":
+        {
+            "Config": "D-Bus",
+            "Type": "Maximum"
+        }
+    },
+    {
+        "Desc":
+        {
+            "Name": "total_power",
+            "SensorType": "power",
+            "MaxValue": 5400,
+            "MinValue": 0
+        },
+        "Threshold" :
+        {
+        },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Mt_Jefferson_Motherboard"
+            ],
+            [
+                "inventory",
+                "sensors",
+                "/xyz/openbmc_project/inventory/system/board/Mt_Jefferson_Motherboard"
+            ]
+        ],
+        "Params":
+        {
+            "DbusParam":
+            [
+                {
+                    "ParamName": "P1",
+                    "Desc":
+                    {
+                        "Name": "PSU1_POUT",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "P2",
+                    "Desc":
+                    {
+                        "Name": "PSU2_POUT",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "sumIgnoreNaN(P1, P2)"
+    }
+]
