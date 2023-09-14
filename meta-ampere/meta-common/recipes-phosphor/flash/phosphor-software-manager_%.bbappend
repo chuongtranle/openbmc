@@ -14,7 +14,7 @@ SYSTEMD_SERVICE:${PN}:updater += "${@bb.utils.contains('PACKAGECONFIG', 'flash_b
 FILES:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'flash_bios', '${systemd_unitdir}/system/allow-reboot-actions.service', '', d)}"
 FILES:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'flash_bios', '${systemd_unitdir}/system/prevent-reboot-actions.service', '', d)}"
 
-RDEPENDS:${PN} += "bash"
+RDEPENDS:${PN} += "bash flashrom"
 
 do_install:append() {
     install -d ${D}/usr/sbin
