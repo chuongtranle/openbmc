@@ -40,7 +40,14 @@ do_flash () {
 	fi
 
 	echo "--- Flashing firmware image $IMAGE to @/dev/$HOST_MTD"
-	flashcp -v "$IMAGE" /dev/"$HOST_MTD"
+	HOST_MTD=${HOST_MTD/"mtd"/""}
+	flashrom -N -n -p linux_mtd:dev="$HOST_MTD" -w "$IMAGE"
+	if [ "$?" == '1' ]; then
+		echo "FAILED: Firmware update!!"
+		exit 1
+	else
+		echo "SUCCESS: Firmware update!!"
+	fi
 }
 
 
