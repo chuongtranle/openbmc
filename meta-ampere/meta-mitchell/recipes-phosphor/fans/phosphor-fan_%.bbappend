@@ -37,8 +37,7 @@ do_install:append () {
         done
 
         install -m 0644 ${WORKDIR}/groups_2p.json \
-               ${D}${datadir}/phosphor-fan-presence/control/${MITCHELL_COMPAT_NAME}/groups.json
-
+                ${D}${datadir}/phosphor-fan-presence/control/${MITCHELL_COMPAT_NAME}/groups.json
         install -m 0644 ${WORKDIR}/monitor.json \
                 ${D}${datadir}/phosphor-fan-presence/monitor/${MITCHELL_COMPAT_NAME}/config.json
         install -m 0644 ${WORKDIR}/presence.json \
