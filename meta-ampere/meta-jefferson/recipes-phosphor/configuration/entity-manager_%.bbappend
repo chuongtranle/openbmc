@@ -2,6 +2,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 SRC_URI += " \
             file://mtjefferson_mb.json \
             file://mtjefferson_bmc.json \
+            file://mtjefferson_cbp2980.json \
             file://mtjefferson_psu.json \
             file://blacklist.json \
            "
@@ -12,5 +13,6 @@ do_install:append() {
     install -d ${D}${datadir}/${PN}/configurations
     install -m 0444 ${WORKDIR}/mtjefferson_mb.json ${D}${datadir}/${PN}/configurations
     install -m 0444 ${WORKDIR}/mtjefferson_bmc.json ${D}${datadir}/${PN}/configurations
+    install -m 0444 ${WORKDIR}/mtjefferson_cbp2980.json ${D}${datadir}/${PN}/configurations
     install -m 0444 ${WORKDIR}/mtjefferson_psu.json ${D}${datadir}/${PN}/configurations
 }
