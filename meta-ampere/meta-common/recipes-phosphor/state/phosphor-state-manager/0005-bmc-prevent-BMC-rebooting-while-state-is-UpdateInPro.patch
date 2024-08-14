@@ -1,0 +1,35 @@
+From 289466c48a63cbe44cb37b7a552e19d621f62524 Mon Sep 17 00:00:00 2001
+From: Thang Tran <thuutran@amperecomputing.com>
+Date: Wed, 21 Aug 2024 08:58:53 +0700
+Subject: [PATCH 5/5] bmc: prevent BMC rebooting while state is
+ UpdateInProgress
+
+When BMC is in the Update mode (flashing BIOS/BMC ...), the reoot action
+should be prevented to ensure that flashing action can be finished.
+
+Tested: Can not reboot BMC while flashing is not finished.
+
+Change-Id: Iaf466b9d4921ba084ae8b66807bd9aade6585fe5
+Signed-off-by: Thang Tran <thuutran@amperecomputing.com>
+---
+ bmc_state_manager.cpp | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/bmc_state_manager.cpp b/bmc_state_manager.cpp
+index 6a26b24..fd454ff 100644
+--- a/bmc_state_manager.cpp
++++ b/bmc_state_manager.cpp
+@@ -178,7 +178,9 @@ void BMC::executeTransition(const Transition tranReq)
+             info("Error in HardReboot: {ERROR}", "ERROR", e);
+         }
+     }
+-    else
++    // Prevent BMC rebooting if BMC is in update mode.
++    else if ((server::BMC::Transition::Reboot == tranReq) &&
++             (server::BMC::currentBMCState() != BMCState::UpdateInProgress))
+     {
+         // Check to make sure it can be found
+         auto iter = SYSTEMD_TABLE.find(tranReq);
+-- 
+2.34.1
+
