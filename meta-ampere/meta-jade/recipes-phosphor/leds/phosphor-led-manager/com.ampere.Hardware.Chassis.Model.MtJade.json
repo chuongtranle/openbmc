@@ -18,7 +18,7 @@
 					"Action": "On",
 					"DutyOn": 50,
 					"Period": 0,
-					"Priority": "Blink"
+					"Priority": "On"
 				}
 			]
 		},
@@ -28,6 +28,7 @@
 				{
 					"Name": "identify",
 					"Action": "On",
+					"Priority": "On",
 					"DutyOn": 50,
 					"Period": 1000
 				}
@@ -39,6 +40,7 @@
 				{
 					"Name": "identify",
 					"Action": "Blink",
+					"Priority": "On",
 					"DutyOn": 50,
 					"Period": 1000
 				}
@@ -50,6 +52,7 @@
 				{
 					"Name": "fault",
 					"Action": "On",
+					"Priority": "On",
 					"DutyOn": 50,
 					"Period": 1000
 				}
@@ -61,6 +64,7 @@
 				{
 					"Name": "fault",
 					"Action": "On",
+					"Priority": "On",
 					"DutyOn": 50,
 					"Period": 1000
 				}
@@ -72,6 +76,7 @@
 				{
 					"Name": "fault",
 					"Action": "On",
+					"Priority": "On",
 					"DutyOn": 50,
 					"Period": 1000
 				}
@@ -83,6 +88,7 @@
 				{
 					"Name": "fault",
 					"Action": "On",
+					"Priority": "On",
 					"DutyOn": 50,
 					"Period": 1000
 				}
@@ -94,6 +100,7 @@
 				{
 					"Name": "fault",
 					"Action": "On",
+					"Priority": "On",
 					"DutyOn": 50,
 					"Period": 1000
 				}
@@ -105,6 +112,7 @@
 				{
 					"Name": "fault",
 					"Action": "On",
+					"Priority": "On",
 					"DutyOn": 50,
 					"Period": 1000
 				}
@@ -116,6 +124,7 @@
 				{
 					"Name": "fault",
 					"Action": "On",
+					"Priority": "On",
 					"DutyOn": 50,
 					"Period": 1000
 				}
@@ -127,6 +136,7 @@
 				{
 					"Name": "fault",
 					"Action": "On",
+					"Priority": "On",
 					"DutyOn": 50,
 					"Period": 1000
 				}
@@ -138,6 +148,7 @@
 				{
 					"Name": "fault",
 					"Action": "On",
+					"Priority": "On",
 					"DutyOn": 50,
 					"Period": 1000
 				}
