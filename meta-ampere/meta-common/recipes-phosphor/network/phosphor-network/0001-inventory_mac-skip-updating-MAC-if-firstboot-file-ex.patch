@@ -1,0 +1,58 @@
+From 026ae19633fec626c9f2b081aa17c90a0fee9560 Mon Sep 17 00:00:00 2001
+From: Chanh Nguyen <chanh@os.amperecomputing.com>
+Date: Wed, 11 Sep 2024 09:37:23 +0000
+Subject: [PATCH] inventory_mac: skip updating MAC if firstboot file exists
+
+If the sync-mac option is enabled and no firstboot file exists,
+a dbus signal is registered to monitor changes from inventory manager,
+the same as the force-sync-mac option works.
+
+When MAC address is updated in the inventory manager, the MAC address
+is set to the Ethernet interface, and the firstboot file is created.
+However, the signal monitor is still watching, and there is no code
+to check the firstboot file again. This leads to the next MAC address
+change being updated unexpectedly.
+
+This commit adds more checks to the firstboot file to avoid this case.
+
+Tested:
+1. Add mapping in entity-manager to NetworkInterface inventory
+        "xyz.openbmc_project.Inventory.Item.NetworkInterface": {
+            "MACAddress": "$BOARD_INFO_AM1"
+        },
+2. Do factory reset the system. Check if in the next boot,
+   the MAC address from FRU is used for eth interface.
+3. Edit MAC Address in FRU by "ipmitool fru edit" command.
+   Wait some seconds and check if eth0 still keeps old MAC Address.
+
+Signed-off-by: Chanh Nguyen <chanh@os.amperecomputing.com>
+---
+ src/inventory_mac.cpp | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/src/inventory_mac.cpp b/src/inventory_mac.cpp
+index b5fd5f7..e4cc646 100644
+--- a/src/inventory_mac.cpp
++++ b/src/inventory_mac.cpp
+@@ -231,9 +231,15 @@ void registerSignals(sdbusplus::bus_t& bus)
+                         {
+                             if (property.first == "MACAddress")
+                             {
+-                                setFirstBootMACOnInterface(
+-                                    pattern.key(),
+-                                    std::get<std::string>(property.second));
++                                // Just set mac address on interface once the firstboot file
++                                // does not exist or it is being FORCE_SYNC_MAC_FROM_INVENTORY
++                                if (FORCE_SYNC_MAC_FROM_INVENTORY ||
++                                    !std::filesystem::exists(firstBootPath + pattern.key()))
++                                {
++                                    setFirstBootMACOnInterface(
++                                        pattern.key(),
++                                        std::get<std::string>(property.second));
++                                }
+                                 break;
+                             }
+                         }
+-- 
+2.43.0
+
