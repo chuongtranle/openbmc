@@ -22,18 +22,36 @@ fan_hwmon_num=$(ls /sys/bus/i2c/drivers/adt7462/8-005c/hwmon)
 fan_hwmon_path="/sys/class/hwmon/$fan_hwmon_num/"
 adt7462_bus_addr="8-005c"
 
+phosphor_fan_service=("phosphor-fan-control@0.service"
+                      "phosphor-fan-monitor@0.service"
+                      "phosphor-fan-presence-tach@0.service"
+                      "phosphor-pid-control.service")
+
 function stop_phosphor_fan_services() {
-	systemctl stop phosphor-fan-control@0.service
-	systemctl stop phosphor-fan-monitor@0.service
-	systemctl stop phosphor-fan-presence-tach@0.service
-	systemctl stop phosphor-pid-control.service
+	for service in "${phosphor_fan_service[@]}"
+	do
+		systemctl stop "$service"
+		busctl call org.freedesktop.systemd1 /org/freedesktop/systemd1 org.freedesktop.systemd1.Manager MaskUnitFiles asbb 1 "$service" true true
+	done
+	systemctl daemon-reload
 }
 
 function start_phosphor_fan_services() {
-	systemctl start phosphor-fan-control@0.service
-	systemctl start phosphor-fan-monitor@0.service
-	systemctl start phosphor-fan-presence-tach@0.service
-	systemctl start phosphor-pid-control.service
+	for service in "${phosphor_fan_service[@]}"
+	do
+		busctl call org.freedesktop.systemd1 /org/freedesktop/systemd1 org.freedesktop.systemd1.Manager UnmaskUnitFiles asb 1 "$service" true
+	done
+
+	systemctl daemon-reload
+
+	for service in "${phosphor_fan_service[@]}"
+	do
+		if [ "$service" == "phosphor-pid-control.service" ] &&
+		[ "$(obmcutil chassisstate | awk -F. '{print $NF}')" == 'Off' ]; then
+			continue
+		fi
+		systemctl start "$service"
+	done
 }
 
 function fan_controller_init() {

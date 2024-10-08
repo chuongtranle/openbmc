@@ -11,16 +11,31 @@ sensorValuePropertyName="Value"
 pwmTargetInterfaceName="xyz.openbmc_project.Control.FanPwm"
 pwmTargetPropertyName="Target"
 
+phosphor_fan_service=("phosphor-fan-control@0.service"
+                      "phosphor-fan-monitor@0.service"
+                      "phosphor-fan-presence-tach@0.service")
+
 function stop_phosphor_fan_services() {
-    systemctl stop phosphor-fan-control@0.service
-    systemctl stop phosphor-fan-monitor@0.service
-    systemctl stop phosphor-fan-presence-tach@0.service
+    for service in "${phosphor_fan_service[@]}"
+    do
+        systemctl stop "$service"
+        busctl call org.freedesktop.systemd1 /org/freedesktop/systemd1 org.freedesktop.systemd1.Manager MaskUnitFiles asbb 1 "$service" true true
+    done
+    systemctl daemon-reload
 }
 
 function start_phosphor_fan_services() {
-    systemctl start phosphor-fan-control@0.service
-    systemctl start phosphor-fan-monitor@0.service
-    systemctl start phosphor-fan-presence-tach@0.service
+    for service in "${phosphor_fan_service[@]}"
+    do
+        busctl call org.freedesktop.systemd1 /org/freedesktop/systemd1 org.freedesktop.systemd1.Manager UnmaskUnitFiles asb 1 "$service" true
+    done
+
+    systemctl daemon-reload
+
+    for service in "${phosphor_fan_service[@]}"
+    do
+        systemctl start "$service"
+    done
 }
 
 function read_speed() {
