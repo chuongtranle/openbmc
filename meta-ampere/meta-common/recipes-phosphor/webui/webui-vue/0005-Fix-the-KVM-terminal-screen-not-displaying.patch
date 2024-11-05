@@ -1,0 +1,43 @@
+From 1cb28a693c53c9036d667d36b75578bd4d9178cf Mon Sep 17 00:00:00 2001
+From: HuyLe <hule@amperecomputing.com>
+Date: Sun, 17 Nov 2024 11:01:35 +0700
+Subject: [PATCH] Fix the KVM terminal screen not displaying
+
+During the upgrade to Vue 3 [1], the initialization of the selector,
+including the definitions of height, display type, background, overflow,
+etc., was ignored, resulting in the KVM screen not displaying the
+terminal screen. This commit helps to import these properties for the
+elements mentioned above from the SCSS file.
+
+Tested:
+1. Go to the OBMC web page.
+2. Go to the KVM page and check that it works normally
+3. By minifying and zooming in on the web browser, the KVM screen
+adjusts automatically.
+4. Switch between different pages.
+5. Return to the KVM page and check that it works normally.
+
+1. https://github.com/openbmc/webui-vue/blob/master/src/App.vue#L38
+
+Signed-off-by: HuyLe <hule@amperecomputing.com>
+---
+ src/views/Operations/Kvm/KvmConsole.vue | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/views/Operations/Kvm/KvmConsole.vue b/src/views/Operations/Kvm/KvmConsole.vue
+index 6e2a4ea..2b3084c 100644
+--- a/src/views/Operations/Kvm/KvmConsole.vue
++++ b/src/views/Operations/Kvm/KvmConsole.vue
+@@ -176,6 +176,10 @@ export default {
+ };
+ </script>
+ 
++<style lang="scss">
++@import '@/assets/styles/bmc/custom/_kvm.scss';
++</style>
++
+ <style lang="scss" scoped>
+ @import '@/assets/styles/bmc/helpers/_index.scss';
+ @import '@/assets/styles/bootstrap/_helpers.scss';
+-- 
+2.25.1
