@@ -11,9 +11,6 @@ source /usr/sbin/utils-lib.sh
 
 pldm_service="xyz.openbmc_project.PLDM"
 s0_plimit_object_path="/xyz/openbmc_project/effecters/power/S0_PLimit"
-s1_plimit_object_path="/xyz/openbmc_project/effecters/power/S1_PLimit"
-s0_dram_throt_en_object_path="/xyz/openbmc_project/effecters/oem/S0_DRAM_MThrotEn"
-s1_dram_throt_en_object_path="/xyz/openbmc_project/effecters/oem/S1_DRAM_MThrotEn"
 
 virtual_sensors_service="xyz.openbmc_project.VirtualSensor"
 total_power_object_path="/xyz/openbmc_project/sensors/power/total_power"
@@ -37,14 +34,6 @@ current_host_state_property="CurrentHostState"
 
 X_limit=10
 devided_value=2
-
-cpu1_presence_flag="false"
-state=$(sx_present 1)
-if [ "$state" == "0" ]
-then
-    cpu1_presence_flag="true"
-    devided_value=4
-fi
 
 function is_host_running()
 {
@@ -106,38 +95,12 @@ function get_Plimit_Sensor_MaxValue()
         ${s0_plimit_object_path} ${value_interface} ${max_value_property})
 }
 
-function get_DRAM_Max_Throttle_Enable()
-{
-    echo $(get_dbus_property ${pldm_service} \
-        ${s0_dram_throt_en_object_path} ${value_interface} ${value_property})
-}
-
 function set_Plimit_Sensor()
 {
     value=$1
 
     $(set_dbus_property ${pldm_service} ${s0_plimit_object_path} \
         ${value_interface} ${value_property} "d" ${value})
-
-    if [ $cpu1_presence_flag == "true" ]
-    then
-        $(set_dbus_property ${pldm_service} ${s1_plimit_object_path} \
-            ${value_interface} ${value_property} "d" ${value})
-    fi
-}
-
-function set_DRAM_Max_Throttle_Enable()
-{
-    value=$1
-
-    $(set_dbus_property ${pldm_service} ${s0_dram_throt_en_object_path} \
-        ${value_interface} ${value_property} "d" ${value})
-
-    if [ $cpu1_presence_flag == "true" ]
-    then
-        $(set_dbus_property ${pldm_service} ${s1_dram_throt_en_object_path} \
-            ${value_interface} ${value_property} "d" ${value})
-    fi
 }
 
 function add_OEM_Action_Redfish_Log()

@@ -26,16 +26,7 @@ Plimit_Sensor=${Plimit_Sensor%.*}
 
 while [ ${System_Power_Limit} -gt ${Current_Sys_Power_Consumed} ]
 do
-    DRAM_Max_Throttle_Enable=$(get_DRAM_Max_Throttle_Enable)
-    if [ -z ${DRAM_Max_Throttle_Enable} ]
-    then
-        exit 0
-    fi
-
-    if [ ${DRAM_Max_Throttle_Enable} -eq 1 ]
-    then
-        set_DRAM_Max_Throttle_Enable 0
-    elif [ ${Plimit_Sensor} -lt ${Plimit_Sensor_MaxValue} ]
+    if [ ${Plimit_Sensor} -lt ${Plimit_Sensor_MaxValue} ]
     then
         X=$((((${System_Power_Limit} - ${Current_Sys_Power_Consumed})) / ${devided_value}))
         if [ ${X} -gt ${X_limit} ]

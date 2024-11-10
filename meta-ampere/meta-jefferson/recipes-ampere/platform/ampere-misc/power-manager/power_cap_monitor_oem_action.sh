@@ -39,7 +39,6 @@ do
         systemctl stop power-cap-exceeds-limit.service
         plimit_max_value=$(get_Plimit_Sensor_MaxValue)
         set_Plimit_Sensor ${plimit_max_value}
-        set_DRAM_Max_Throttle_Enable 0
     fi
 
     sleep 2
