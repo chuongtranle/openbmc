@@ -1,5 +1,4 @@
 FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
-FILESEXTRAPATHS:append := "${THISDIR}/${PN}/${MACHINE}:"
 
 RDEPENDS:${PN}-monitor += "bash"
 
@@ -11,14 +10,7 @@ SRC_URI:append = " file://events.json \
                   file://zones.json \
                   file://monitor.json \
                   file://presence.json \
-                  file://phosphor-fan-control@.service \
-                  file://phosphor-fan-monitor@.service \
-                  file://ampere_set_fan_max_speed.sh \
                 "
-
-FILES:${PN}-monitor += " \
-                        ${bindir}/ampere_set_fan_max_speed.sh \
-                       "
 
 do_configure:prepend() {
         mkdir -p ${S}/control/config_files/${MACHINE}
@@ -34,12 +26,5 @@ do_configure:prepend() {
         cp ${WORKDIR}/presence.json ${S}/presence/config_files/${MACHINE}/config.json
 }
 
-do_install:append() {
-  install -d ${D}${bindir}
-  install -m 0755 ${WORKDIR}/ampere_set_fan_max_speed.sh ${D}${bindir}/ampere_set_fan_max_speed.sh
-  install -d ${D}${systemd_system_unitdir}
-  install -m 0644 ${WORKDIR}/phosphor-fan-monitor@.service ${D}${systemd_system_unitdir}
-  install -m 0644 ${WORKDIR}/phosphor-fan-control@.service ${D}${systemd_system_unitdir}
-}
 
 

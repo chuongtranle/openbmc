@@ -1,5 +1,5 @@
 [Unit]
-Description=Phosphor Fan Control Daemon
+Description=Phosphor Fan Monitor Daemon
 Wants=xyz.openbmc_project.fansensor.service
 After=xyz.openbmc_project.fansensor.service
 StartLimitIntervalSec=30
@@ -7,5 +7,6 @@ StartLimitBurst=3
 
 [Service]
 Restart=always
-ExecStart=-phosphor-fan-control
+ExecStart=-phosphor-fan-monitor
 RestartSec=20
+ExecStopPost=/usr/sbin/ampere_fanctrl.sh setspeed all 100
