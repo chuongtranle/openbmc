@@ -17,6 +17,7 @@ SRC_URI += "\
             file://0009-dcmi-Support-Set-Get-AssetTag-to-FRU.patch \
             file://0010-dbus-sdr-round-up-the-M-factor-of-sensor.patch \
             file://0011-dbus-sdr-replace-sort-with-stable_sort-function.patch \
+            file://0012-transporthandler-Report-IP-address-via-configured-IP.patch \
             file://ampere-phosphor-softpoweroff \
             file://ampere.xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service \
            "

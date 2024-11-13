@@ -1,0 +1,83 @@
+From 7b0aafcf5d48b99303bd1814b4e28dfee835a325 Mon Sep 17 00:00:00 2001
+From: Chanh Nguyen <chanh@os.amperecomputing.com>
+Date: Thu, 14 Nov 2024 09:51:40 +0000
+Subject: [PATCH] transporthandler: Report IP address via configured IP source
+
+In case both DHCP and static IP addresses are assigned, the IPMI
+code just returns one of them. The IPMI code always returns the
+first object dbus on the interface by the fixed index, which is
+always 0. That may cause a mismatch between the IP address and
+IP address source.
+
+This patch will check if the DHCP or static mode is enabling,
+then return the IP address accordingly.
+
+Tested:
+1. Change to static source
+ipmitool lan set 1 ipsrc static
+
+2. Set a static IP address.
+ipmitool lan set 1 ipaddr xx.xx.xx.xx
+
+3. Back to DHCP source
+ipmitool lan set 1 ipsrc dhcp
+
+4. Check the IP Lan print.
+Expect the IP address and IP source address report accordingly.
+
+ipmitool lan print 1
+
+Fixes openbmc/phosphor-host-ipmid#207
+
+Change-Id: I2362d44989c68073f7ec6505420efacfc7703e62
+Signed-off-by: Chanh Nguyen <chanh@os.amperecomputing.com>
+---
+ transporthandler.cpp | 32 +++++++++++++++++++++++++++++++-
+ 1 file changed, 31 insertions(+), 1 deletion(-)
+
+diff --git a/transporthandler.cpp b/transporthandler.cpp
+index 6e7dae2..65b36d1 100644
+--- a/transporthandler.cpp
++++ b/transporthandler.cpp
+@@ -277,7 +277,37 @@ void createIfAddr(sdbusplus::bus_t& bus, const ChannelParams& params,
+  */
+ auto getIfAddr4(sdbusplus::bus_t& bus, const ChannelParams& params)
+ {
+-    return getIfAddr<AF_INET>(bus, params, 0, originsV4);
++    std::optional<IfAddr<AF_INET>> ifaddr4 = std::nullopt;
++
++    try
++    {
++        IP::AddressOrigin src = std::get<bool>(
++                  getDbusProperty(bus, params.service, params.logicalPath,
++                                  INTF_ETHERNET, "DHCP4"))
++                  ? IP::AddressOrigin::DHCP
++                  : IP::AddressOrigin::Static;
++
++        auto objectTree = getAllDbusObjects(bus, params.logicalPath, INTF_IP);
++        for (uint8_t i = 0; i < objectTree.size(); i++)
++        {
++            ifaddr4 = getIfAddr<AF_INET>(bus, params, i, originsV4);
++            if (ifaddr4)
++            {
++                if (src == ifaddr4->origin)
++                {
++                    return ifaddr4;
++                }
++                ifaddr4 = std::nullopt;
++            }
++        }
++    }
++    catch (const sdbusplus::exception_t& e)
++    {
++        lg2::error("Failed to get IPv4 address from getIfAddrs");
++    }
++
++    return ifaddr4;
++
+ }
+ 
+ /** @brief Reconfigures the IPv4 address info configured for the interface
+-- 
+2.43.0
+
