@@ -9,6 +9,7 @@ SRC_URI += " \
               file://0003-host-state-emit-dbus-signals-while-initialization.patch \
               file://0004-bmc-change-BMC-s-state-to-UpdateInProgress-while-BMC.patch \
               file://0005-bmc-prevent-BMC-rebooting-while-state-is-UpdateInPro.patch \
+              file://0006-discover-no-power-restore-policy-on-Software-cold-re.patch \
               file://ampere_phosphor-service-monitor-default.json \
            "
 
