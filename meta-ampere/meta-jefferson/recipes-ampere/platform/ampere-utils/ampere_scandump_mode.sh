@@ -11,14 +11,56 @@
 #
 # To get Scandump mode status:
 #    ampere_scandump_mode.sh getstatus
+#
+# The init() function will be called during BMC bootup
+# to preserve the scandump condition (no user interaction)
+
+
+dependent_services=("ampere-sysfw-hang-handler.service"
+                    "pldmd.service")
+
+init() {
+	status=$(getstatus)
+
+	if [[ $status =~ "enabled" ]]
+	then
+		echo "Preserve Scandump mode as enabled"
+		handle_dependencies "disable"
+	fi
+}
+
+handle_dependencies() {
+	action=$1
+	if [[ $action == "enable" ]]; then
+		echo "Recover scandump mode dependent services"
+		for service in "${dependent_services[@]}"
+		do
+			systemctl start "$service"
+		done
+		# Enable fan control
+		/usr/sbin/ampere_fanctrl.sh setstatus 0
+	else
+		echo "Disable scandump mode dependent services"
+		for service in "${dependent_services[@]}"
+		do
+			systemctl stop "$service"
+		done
+		# Disable fan control
+		/usr/sbin/ampere_fanctrl.sh setstatus 1
+		/usr/sbin/ampere_fanctrl.sh setspeed all 100
+	fi
+}
 
 enable_scandump_mode() {
+	status=$(getstatus)
+	if [[ $status =~ "enabled" ]]
+	then
+		echo "Scandump mode is already enabled"
+		exit 0
+	fi
 	echo "Enable Scandump mode"
-	# Disable Mpro hang detection
-	systemctl stop ampere-sysfw-hang-handler.service
 
-	# Disable PLDM service
-	systemctl stop pldmd.service
+	handle_dependencies "disable"
 
 	# Enable scandump mode in CPLD
 	# Get Port0 value
@@ -48,11 +90,7 @@ diable_scandump_mode() {
 	# Config CPLD's IOepx Port0[4] from output to input, set IOepx Port0[4].
 	i2cset -f -y 15 0x22 0x06 $p0_IOexp_val
 
-	# Enable Mpro hang detection
-	systemctl start ampere-sysfw-hang-handler.service
-
-	# Enable PLDM service
-	systemctl start pldmd.service
+	handle_dependencies "enable"
 }
 
 getstatus() {
@@ -86,9 +124,9 @@ elif [[ $1 == "disable" ]]; then
 	diable_scandump_mode
 elif [[ $1 == "getstatus" ]]; then
 	getstatus
+elif [[ $1 == "init" ]]; then
+	init
 else
 	echo "Invalid mode"
 	usage
 fi
-
-exit 0

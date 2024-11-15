@@ -43,10 +43,7 @@ function fan_controller_init() {
     echo 8-005c > /sys/bus/i2c/drivers/adt7462/bind
 
     echo "Set default FAN speed to 60%"
-    for filename in /sys/class/hwmon/*/pwm[0-9]
-    do
-        echo 153 > "$filename"
-    done
+    /usr/sbin/ampere_fanctrl.sh setspeed all 60
 }
 
 # Setting default value for device sel and mux
@@ -98,5 +95,8 @@ if [[ ! -e /dev/rtc0 ]]; then
     echo "Bind rtc driver"
     echo 6-0051 > /sys/bus/i2c/drivers/rtc-pcf8563/bind
 fi
+
+# Initial checking of scandump mode to preserve scandump state if necessary
+/usr/sbin/ampere_scandump_mode.sh init
 
 exit 0
