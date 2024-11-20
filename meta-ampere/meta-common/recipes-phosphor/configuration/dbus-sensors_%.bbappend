@@ -9,4 +9,5 @@ SRC_URI += " \
             file://0003-ADC-Match-InterfaceAdded-signal.patch \
             file://0004-Support-configuration-Max-Min-values-from-EM.patch \
             file://0005-adcsensor-support-PresenceGpio-option.patch \
+            file://0006-psusensor-monitor-interfaceAdded-signal-for-CPU-obje.patch \
            "
