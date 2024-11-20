@@ -6,4 +6,5 @@ SRC_URI += "\
             file://0003-Change-to-display-1000-last-event-logs.patch \
             file://0004-Set-ApplyTime-to-Immediate.patch \
 	    file://0005-Fix-the-KVM-terminal-screen-not-displaying.patch \
+	    file://0006-Use-the-createWebHashHistory-method-to-avoid-404-err.patch \
            "
