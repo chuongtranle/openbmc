@@ -9,4 +9,3 @@ StartLimitBurst=3
 Restart=always
 ExecStart=-phosphor-fan-monitor
 RestartSec=20
-ExecStopPost=/usr/sbin/ampere_fanctrl.sh setspeed all 100

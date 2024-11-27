@@ -10,7 +10,10 @@ SRC_URI:append = " file://events.json \
                   file://zones.json \
                   file://monitor.json \
                   file://presence.json \
+                  file://phosphor-fan-control.conf \
                 "
+
+SYSTEMD_OVERRIDE:${PN}-control += "phosphor-fan-control.conf:phosphor-fan-control@0.service.d/phosphor-fan-control.conf"
 
 do_configure:prepend() {
         mkdir -p ${S}/control/config_files/${MACHINE}
