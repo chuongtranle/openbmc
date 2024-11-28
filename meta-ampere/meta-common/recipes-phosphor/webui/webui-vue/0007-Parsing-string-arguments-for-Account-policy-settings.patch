@@ -1,0 +1,44 @@
+From bef5b6588285eccc9b25874c9ba54b8cd851b1fb Mon Sep 17 00:00:00 2001
+From: Huy Le Anh <hule@amperecomputing.com>
+Date: Thu, 28 Nov 2024 14:02:55 +0700
+Subject: [PATCH] Parsing string arguments for Account policy settings after
+ Vue3 merge
+
+Vue 3 implements stricter data type testing compared to Vue 2. This
+affects how data is initialized and updated, causing some values to not
+be handled properly. This commit uses `parseInt` to convert strings to
+integers for "Max failed login attempts" and "Automatic logout after
+timeout."
+
+Tested:
+ 1. Log in to BMC Web and go to the User Management page.
+ 2. Click "Account policy settings" to edit:
+    - Max failed login attempts
+    - Automatic logout after timeout
+ 3. Save successfully.
+
+Signed-off-by: Huy Le Anh <hule@amperecomputing.com>
+---
+ src/store/modules/SecurityAndAccess/UserManagementStore.js | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/store/modules/SecurityAndAccess/UserManagementStore.js b/src/store/modules/SecurityAndAccess/UserManagementStore.js
+index b1860d1..c439c30 100644
+--- a/src/store/modules/SecurityAndAccess/UserManagementStore.js
++++ b/src/store/modules/SecurityAndAccess/UserManagementStore.js
+@@ -320,10 +320,10 @@ const UserManagementStore = {
+     ) {
+       const data = {};
+       if (lockoutThreshold !== undefined) {
+-        data.AccountLockoutThreshold = lockoutThreshold;
++        data.AccountLockoutThreshold = parseInt(lockoutThreshold);
+       }
+       if (lockoutDuration !== undefined) {
+-        data.AccountLockoutDuration = lockoutDuration;
++        data.AccountLockoutDuration = parseInt(lockoutDuration);
+       }
+ 
+       return await api
+-- 
+2.25.1
+

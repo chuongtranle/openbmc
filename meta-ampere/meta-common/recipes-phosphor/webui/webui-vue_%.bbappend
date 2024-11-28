@@ -7,4 +7,5 @@ SRC_URI += "\
             file://0004-Set-ApplyTime-to-Immediate.patch \
 	    file://0005-Fix-the-KVM-terminal-screen-not-displaying.patch \
 	    file://0006-Use-the-createWebHashHistory-method-to-avoid-404-err.patch \
+            file://0007-Parsing-string-arguments-for-Account-policy-settings.patch \
            "
