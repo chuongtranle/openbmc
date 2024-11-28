@@ -1,0 +1,31 @@
+diff --git a/include/dimm.hpp b/include/dimm.hpp
+index a3a48be..8715e73 100644
+--- a/include/dimm.hpp
++++ b/include/dimm.hpp
+@@ -222,7 +222,8 @@ const std::map<uint8_t, DeviceType> dimmTypeTable = {
+     {0x1c, DeviceType::LPDDR2_SDRAM}, {0x1d, DeviceType::LPDDR3_SDRAM},
+     {0x1e, DeviceType::LPDDR4_SDRAM}, {0x1f, DeviceType::Logical},
+     {0x20, DeviceType::HBM},          {0x21, DeviceType::HBM2},
+-    {0x22, DeviceType::DDR5},         {0x23, DeviceType::LPDDR5_SDRAM}};
++    {0x22, DeviceType::DDR5},         {0x23, DeviceType::LPDDR5_SDRAM},
++    {0x24, DeviceType::HBM3}};
+
+ const std::array<std::string, 16> detailTable{
+     "Reserved",      "Other",         "Unknown",     "Fast-paged",
+diff --git a/include/smbios_mdrv2.hpp b/include/smbios_mdrv2.hpp
+index 1224f1e..3638537 100644
+--- a/include/smbios_mdrv2.hpp
++++ b/include/smbios_mdrv2.hpp
+@@ -165,9 +165,10 @@ static constexpr const char* pcieSuffix = "/chassis/motherboard/pcieslot";
+
+ static constexpr const char* systemSuffix = "/chassis/motherboard/bios";
+
+-constexpr std::array<SMBIOSVersion, 5> supportedSMBIOSVersions{
++constexpr std::array<SMBIOSVersion, 7> supportedSMBIOSVersions{
+     SMBIOSVersion{3, 0}, SMBIOSVersion{3, 2}, SMBIOSVersion{3, 3},
+-    SMBIOSVersion{3, 4}, SMBIOSVersion{3, 5}};
++    SMBIOSVersion{3, 4}, SMBIOSVersion{3, 5}, SMBIOSVersion{3, 6},
++    SMBIOSVersion{3, 7}};
+
+ typedef enum
+ {
