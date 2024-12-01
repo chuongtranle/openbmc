@@ -19,7 +19,7 @@ SRC_URI += " \
             file://0009-LogService-Support-download-FaultLog-data-via-Additi.patch \
             file://0010-update-service-get-ApplyTime-from-Dbus.patch \
             file://0011-managers-pid-fan-Ignore-AccumulateSetPoint.patch \
-            file://0012-Don-t-delete-DefaultGateway-when-disabling-DHCP.patch \
+            file://0012-Improve-IPv4-default-gateway-removal.patch \
             file://ampere-registries.json \
            "
 
