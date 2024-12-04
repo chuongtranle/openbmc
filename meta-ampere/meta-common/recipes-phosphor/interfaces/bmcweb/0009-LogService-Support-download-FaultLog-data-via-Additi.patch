@@ -1,4 +1,4 @@
-From a24f5fb522673a15472d5de5e742eebb596d5c2a Mon Sep 17 00:00:00 2001
+From 051b4d1e05ee41dae74539d2fca01fc227fff7bf Mon Sep 17 00:00:00 2001
 From: Dung Cao <dung@os.amperecomputing.com>
 Date: Thu, 22 Aug 2024 12:11:55 +0700
 Subject: [PATCH] LogService: Support download FaultLog data via
@@ -38,24 +38,15 @@ curl -k -H "X-Auth-Token: $token" -X GET  \
 
 Signed-off-by: Dung Cao <dung@os.amperecomputing.com>
 ---
- redfish-core/lib/log_services.hpp | 188 +++++++++++++++++++++++++-----
+ redfish-core/lib/log_services.hpp | 172 +++++++++++++++++++++++++-----
  redfish-core/src/redfish.cpp      |   1 +
- 2 files changed, 163 insertions(+), 26 deletions(-)
+ 2 files changed, 147 insertions(+), 26 deletions(-)
 
 diff --git a/redfish-core/lib/log_services.hpp b/redfish-core/lib/log_services.hpp
-index 31b51da0..0c6b1a4d 100644
+index 31b51da0..6cb63de3 100644
 --- a/redfish-core/lib/log_services.hpp
 +++ b/redfish-core/lib/log_services.hpp
-@@ -70,6 +70,8 @@ constexpr const char* crashdumpOnDemandInterface =
-     "com.intel.crashdump.OnDemand";
- constexpr const char* crashdumpTelemetryInterface =
-     "com.intel.crashdump.Telemetry";
-+constexpr const char* cperLogDir = "/var/lib/faultlogs/cper/";
-+constexpr const char* crashdumpLogDir = "/var/lib/faultlogs/crashdump/";
- 
- enum class DumpCreationProgress
- {
-@@ -216,6 +218,7 @@ inline void parseDumpEntryFromDbusObject(
+@@ -216,6 +216,7 @@ inline void parseDumpEntryFromDbusObject(
      std::string& dumpStatus, uint64_t& size, uint64_t& timestampUs,
      std::string& originatorId, log_entry::OriginatorTypes& originatorType,
      std::string& entryType, std::string& primaryLogId,
@@ -63,7 +54,7 @@ index 31b51da0..0c6b1a4d 100644
      const std::shared_ptr<bmcweb::AsyncResp>& asyncResp)
  {
      for (const auto& interfaceMap : object.second)
-@@ -346,6 +349,17 @@ inline void parseDumpEntryFromDbusObject(
+@@ -346,6 +347,17 @@ inline void parseDumpEntryFromDbusObject(
                      }
                      primaryLogId = *primaryLogIdPtr;
                  }
@@ -81,16 +72,15 @@ index 31b51da0..0c6b1a4d 100644
              }
          }
      }
-@@ -444,6 +458,8 @@ inline void
+@@ -444,6 +456,7 @@ inline void
                      log_entry::OriginatorTypes::Internal;
                  std::string primaryLogId;
                  std::string entryType;
 +                std::string additionalType;
-+                std::string faultlogPath;
                  nlohmann::json::object_t thisEntry;
  
                  std::string entryID = object.first.filename();
-@@ -454,7 +470,8 @@ inline void
+@@ -454,7 +467,8 @@ inline void
  
                  parseDumpEntryFromDbusObject(
                      object, dumpStatus, size, timestampUs, originatorId,
@@ -100,7 +90,7 @@ index 31b51da0..0c6b1a4d 100644
  
                  if (dumpStatus !=
                          "xyz.openbmc_project.Common.Progress.OperationStatus.Completed" &&
-@@ -495,23 +512,28 @@ inline void
+@@ -495,23 +509,26 @@ inline void
                  }
                  else if (dumpType == "FaultLog")
                  {
@@ -115,7 +105,6 @@ index 31b51da0..0c6b1a4d 100644
 -                            primaryLogId;
 -                        thisEntry["OemRecordFormat"] = "CPER";
 +                        thisEntry["DiagnosticDataType"] = "CPER";
-+                        faultlogPath = cperLogDir + primaryLogId;
                      }
                      else if (entryType == "Crashdump")
 +                    {
@@ -128,9 +117,8 @@ index 31b51da0..0c6b1a4d 100644
 +                        {
 +                            thisEntry["OEMDiagnosticDataType"] = "Crashdump";
 +                        }
-+                        faultlogPath = crashdumpLogDir + primaryLogId;
 +                    }
-+                    if (std::filesystem::exists(faultlogPath))
++                    if (std::filesystem::exists(primaryLogId))
                      {
                          thisEntry["AdditionalDataURI"] =
 -                            "/redfish/v1/Systems/system/LogServices/Crashdump/Entries/" +
@@ -140,7 +128,7 @@ index 31b51da0..0c6b1a4d 100644
                      }
                  }
                  entriesArray.emplace_back(std::move(thisEntry));
-@@ -565,10 +587,13 @@ inline void
+@@ -565,10 +582,13 @@ inline void
                      log_entry::OriginatorTypes::Internal;
                  std::string primaryLogId;
                  std::string entryType;
@@ -155,7 +143,7 @@ index 31b51da0..0c6b1a4d 100644
  
                  if (dumpStatus !=
                          "xyz.openbmc_project.Common.Progress.OperationStatus.Completed" &&
-@@ -614,25 +639,30 @@ inline void
+@@ -614,25 +634,28 @@ inline void
                  }
                  else if (dumpType == "FaultLog")
                  {
@@ -171,7 +159,6 @@ index 31b51da0..0c6b1a4d 100644
 -                            primaryLogId;
 -                        asyncResp->res.jsonValue["OemRecordFormat"] = "CPER";
 +                        asyncResp->res.jsonValue["DiagnosticDataType"] = "CPER";
-+                        faultlogPath = cperLogDir + primaryLogId;
                      }
                      else if (entryType == "Crashdump")
 +                    {
@@ -186,9 +173,8 @@ index 31b51da0..0c6b1a4d 100644
 +                            asyncResp->res.jsonValue["OEMDiagnosticDataType"] =
 +                                "Crashdump";
 +                        }
-+                        faultlogPath = crashdumpLogDir + primaryLogId;
 +                    }
-+                    if (std::filesystem::exists(faultlogPath))
++                    if (std::filesystem::exists(primaryLogId))
                      {
                          asyncResp->res.jsonValue["AdditionalDataURI"] =
 -                            "/redfish/v1/Systems/system/LogServices/Crashdump/Entries/" +
@@ -199,7 +185,7 @@ index 31b51da0..0c6b1a4d 100644
                      }
                  }
              }
-@@ -3319,4 +3349,110 @@ inline void requestRoutesDBusLogServiceActionsClear(App& app)
+@@ -3319,4 +3342,101 @@ inline void requestRoutesDBusLogServiceActionsClear(App& app)
              });
  }
  
@@ -256,7 +242,6 @@ index 31b51da0..0c6b1a4d 100644
 +                            std::string primaryLogId;
 +                            std::string entryType;
 +                            std::string additionalType;
-+                            std::string faultlogPath;
 +                            std::string originatorId;
 +                            log_entry::OriginatorTypes originatorType =
 +                                log_entry::OriginatorTypes::Internal;
@@ -266,22 +251,14 @@ index 31b51da0..0c6b1a4d 100644
 +                                originatorId, originatorType, entryType,
 +                                primaryLogId, additionalType, asyncResp);
 +
-+                            if (entryType == "CPER")
-+                            {
-+                                faultlogPath = cperLogDir + primaryLogId;
-+                            }
-+                            else if (entryType == "Crashdump")
-+                            {
-+                                faultlogPath = crashdumpLogDir + primaryLogId;
-+                            }
-+                            std::ifstream inStream(faultlogPath.c_str(),
++                            std::ifstream inStream(primaryLogId.c_str(),
 +                                                   std::ifstream::in |
 +                                                       std::ifstream::binary);
 +                            if (!inStream)
 +                            {
 +                                BMCWEB_LOG_ERROR(
 +                                    "The FaultLog Dir is not exist: {}",
-+                                    faultlogPath.c_str());
++                                    primaryLogId.c_str());
 +                                messages::internalError(asyncResp->res);
 +                                return;
 +                            }
