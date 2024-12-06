@@ -9,4 +9,5 @@ SRC_URI += "\
 	    file://0006-Use-the-createWebHashHistory-method-to-avoid-404-err.patch \
             file://0007-Parsing-string-arguments-for-Account-policy-settings.patch \
             file://0008-Fix-date-time-format-regex-check.patch \
+            file://0009-Bios-Option-Remove-oneTimeBootEnabled-check.patch \
            "
