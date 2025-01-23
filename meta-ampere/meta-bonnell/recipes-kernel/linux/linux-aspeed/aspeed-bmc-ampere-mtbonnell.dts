@@ -1,0 +1,498 @@
+// SPDX-License-Identifier: GPL-2.0-only
+// Copyright (c) 2022, Ampere Computing LLC
+
+/dts-v1/;
+
+#include "aspeed-g6.dtsi"
+#include <dt-bindings/i2c/i2c.h>
+#include <dt-bindings/gpio/aspeed-gpio.h>
+
+/ {
+	model = "Ampere Mt.Bonnell BMC";
+	compatible = "ampere,mtbonnell-bmc", "aspeed,ast2600";
+
+	aliases {
+		/*
+		 *  I2C NVMe alias port
+		 */
+	};
+
+	chosen {
+		stdout-path = &uart5;
+	};
+
+	memory@80000000 {
+		device_type = "memory";
+		reg = <0x80000000 0x80000000>;
+	};
+
+	reserved-memory {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		gfx_memory: framebuffer {
+			size = <0x01000000>;
+			alignment = <0x01000000>;
+			compatible = "shared-dma-pool";
+			reusable;
+		};
+
+		video_engine_memory: video {
+			size = <0x04000000>;
+			alignment = <0x01000000>;
+			compatible = "shared-dma-pool";
+			reusable;
+		};
+
+		vga_memory: region@bf000000 {
+			no-map;
+			compatible = "shared-dma-pool";
+			reg = <0xbf000000 0x01000000>;  /* 16M */
+		};
+	};
+
+	voltage_mon_reg: voltage-mon-regulator {
+		compatible = "regulator-fixed";
+		regulator-name = "ltc2497_reg";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
+	};
+
+	gpioS1mux: mux-controller {
+		compatible = "gpio-mux";
+		#mux-control-cells = <0>;
+		mux-gpios = <&gpio0 ASPEED_GPIO(S, 1) GPIO_ACTIVE_LOW>;
+	};
+
+	adc0mux: adc0mux {
+		compatible = "io-channel-mux";
+		io-channels = <&adc0 0>;
+		#io-channel-cells = <1>;
+		io-channel-names = "parent";
+		mux-controls = <&gpioS1mux>;
+		settle-time-us = <10000>;
+		channels = "s0", "s1";
+	};
+
+	adc1mux: adc1mux {
+		compatible = "io-channel-mux";
+		io-channels = <&adc0 1>;
+		#io-channel-cells = <1>;
+		io-channel-names = "parent";
+		mux-controls = <&gpioS1mux>;
+		settle-time-us = <10000>;
+		channels = "s0", "s1";
+	};
+
+	adc2mux: adc2mux {
+		compatible = "io-channel-mux";
+		io-channels = <&adc0 2>;
+		#io-channel-cells = <1>;
+		io-channel-names = "parent";
+		mux-controls = <&gpioS1mux>;
+		settle-time-us = <10000>;
+		channels = "s0", "s1";
+	};
+
+	adc3mux: adc3mux {
+		compatible = "io-channel-mux";
+		io-channels = <&adc0 3>;
+		#io-channel-cells = <1>;
+		io-channel-names = "parent";
+		mux-controls = <&gpioS1mux>;
+		settle-time-us = <10000>;
+		channels = "s0", "s1";
+	};
+
+	adc4mux: adc4mux {
+		compatible = "io-channel-mux";
+		io-channels = <&adc0 4>;
+		#io-channel-cells = <1>;
+		io-channel-names = "parent";
+		mux-controls = <&gpioS1mux>;
+		settle-time-us = <10000>;
+		channels = "s0", "s1";
+	};
+
+	adc5mux: adc5mux {
+		compatible = "io-channel-mux";
+		io-channels = <&adc0 5>;
+		#io-channel-cells = <1>;
+		io-channel-names = "parent";
+		mux-controls = <&gpioS1mux>;
+		settle-time-us = <10000>;
+		channels = "s0", "s1";
+	};
+
+	adc6mux: adc6mux {
+		compatible = "io-channel-mux";
+		io-channels = <&adc0 6>;
+		#io-channel-cells = <1>;
+		io-channel-names = "parent";
+		mux-controls = <&gpioS1mux>;
+		settle-time-us = <10000>;
+		channels = "s0", "s1";
+	};
+
+	adc7mux: adc7mux {
+		compatible = "io-channel-mux";
+		io-channels = <&adc0 7>;
+		#io-channel-cells = <1>;
+		io-channel-names = "parent";
+		mux-controls = <&gpioS1mux>;
+		settle-time-us = <10000>;
+		channels = "s0", "s1";
+	};
+
+	adc8mux: adc8mux {
+		compatible = "io-channel-mux";
+		io-channels = <&adc1 0>;
+		#io-channel-cells = <1>;
+		io-channel-names = "parent";
+		mux-controls = <&gpioS1mux>;
+		settle-time-us = <10000>;
+		channels = "s0", "s1";
+	};
+
+	adc9mux: adc9mux {
+		compatible = "io-channel-mux";
+		io-channels = <&adc1 1>;
+		#io-channel-cells = <1>;
+		io-channel-names = "parent";
+		mux-controls = <&gpioS1mux>;
+		settle-time-us = <10000>;
+		channels = "s0", "s1";
+	};
+
+	adc10mux: adc10mux {
+		compatible = "io-channel-mux";
+		io-channels = <&adc1 2>;
+		#io-channel-cells = <1>;
+		io-channel-names = "parent";
+		mux-controls = <&gpioS1mux>;
+		settle-time-us = <10000>;
+		channels = "s0", "s1";
+	};
+
+	adc11mux: adc11mux {
+		compatible = "io-channel-mux";
+		io-channels = <&adc1 3>;
+		#io-channel-cells = <1>;
+		io-channel-names = "parent";
+		mux-controls = <&gpioS1mux>;
+		settle-time-us = <10000>;
+		channels = "s0", "s1";
+	};
+
+	adc12mux: adc12mux {
+		compatible = "io-channel-mux";
+		io-channels = <&adc1 4>;
+		#io-channel-cells = <1>;
+		io-channel-names = "parent";
+		mux-controls = <&gpioS1mux>;
+		settle-time-us = <10000>;
+		channels = "s0", "s1";
+	};
+
+	adc13mux: adc13mux {
+		compatible = "io-channel-mux";
+		io-channels = <&adc1 5>;
+		#io-channel-cells = <1>;
+		io-channel-names = "parent";
+		mux-controls = <&gpioS1mux>;
+		settle-time-us = <10000>;
+		channels = "s0", "s1";
+	};
+
+	adc14mux: adc14mux {
+		compatible = "io-channel-mux";
+		io-channels = <&adc1 6>;
+		#io-channel-cells = <1>;
+		io-channel-names = "parent";
+		mux-controls = <&gpioS1mux>;
+		settle-time-us = <10000>;
+		channels = "s0", "s1";
+	};
+
+	adc15mux: adc15mux {
+		compatible = "io-channel-mux";
+		io-channels = <&adc1 7>;
+		#io-channel-cells = <1>;
+		io-channel-names = "parent";
+		mux-controls = <&gpioS1mux>;
+		settle-time-us = <10000>;
+		channels = "s0", "s1";
+	};
+
+	iio-hwmon {
+		compatible = "iio-hwmon";
+		io-channels =	<&adc0mux 0>, <&adc0mux 1>,
+				<&adc1mux 0>, <&adc1mux 1>,
+				<&adc2mux 0>, <&adc2mux 1>,
+				<&adc3mux 0>, <&adc3mux 1>,
+				<&adc4mux 0>, <&adc4mux 1>,
+				<&adc5mux 0>, <&adc5mux 1>,
+				<&adc6mux 0>, <&adc6mux 1>,
+				<&adc7mux 0>, <&adc7mux 1>,
+				<&adc8mux 0>, <&adc8mux 1>,
+				<&adc9mux 0>, <&adc9mux 1>,
+				<&adc10mux 0>, <&adc10mux 1>,
+				<&adc11mux 0>, <&adc11mux 1>,
+				<&adc12mux 0>, <&adc12mux 1>,
+				<&adc13mux 0>, <&adc13mux 1>,
+				<&adc14mux 0>, <&adc14mux 1>,
+				<&adc15mux 0>, <&adc15mux 1>;
+	};
+};
+
+/*
+&mdio0 {
+	status = "okay";
+
+	ethphy0: ethernet-phy@0 {
+		compatible = "ethernet-phy-ieee802.3-c22";
+		reg = <0>;
+	};
+};
+*/
+
+&mac2 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_rmii3_default>;
+	clock-names = "MACCLK", "RCLK";
+	use-ncsi;
+};
+
+&mac3 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_rmii4_default>;
+	clock-names = "MACCLK", "RCLK";
+	use-ncsi;
+};
+
+&fmc {
+	status = "okay";
+	flash@0 {
+		status = "okay";
+		m25p,fast-read;
+		label = "bmc";
+		spi-max-frequency = <50000000>;
+#include "openbmc-flash-layout-64.dtsi"
+	};
+
+	flash@1 {
+		status = "okay";
+		m25p,fast-read;
+		label = "alt-bmc";
+		spi-max-frequency = <50000000>;
+#include "openbmc-flash-layout-64-alt.dtsi"
+	};
+};
+
+&spi1 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_spi1_default>;
+
+	flash@0 {
+		status = "okay";
+		m25p,fast-read;
+		label = "pnor";
+		spi-max-frequency = <20000000>;
+	};
+};
+
+&uart1 {
+	status = "okay";
+};
+
+&uart2 {
+	status = "okay";
+};
+
+&uart3 {
+	status = "okay";
+};
+
+/* BMC's UART */
+&uart5 {
+	status = "okay";
+};
+
+&i2c0 {
+	status = "okay";
+};
+
+&i2c1 {
+	status = "okay";
+
+  // CPU SCP EEPROM
+	eeprom@50 {
+		compatible = "atmel,24c64";
+		reg = <0x50>;
+		pagesize = <32>;
+	};
+
+};
+
+&i2c2 {
+	status = "okay";
+
+  // SCP Register Map
+	smpro@4f {
+    compatible = "ampere,smpro";
+    reg = <0x4f>;
+  };
+};
+
+&i2c3 {
+	status = "okay";
+
+	eeprom@50 {
+		compatible = "atmel,24c64";
+		reg = <0x50>;
+		pagesize = <32>;
+	};
+
+  // TODO: temperature sensor
+
+};
+
+&i2c4 {
+	status = "okay";
+
+	rtc@51 {
+		compatible = "nxp,pcf85063a";
+		reg = <0x51>;
+	};
+};
+
+&i2c5 {
+	status = "okay";
+  // PDB SMBus
+};
+
+&i2c6 {
+	status = "okay";
+  // PSU FRU
+};
+
+&i2c7 {
+	status = "okay";
+  // DIMM
+};
+
+&i2c8 {
+	status = "okay";
+  // VRD
+};
+
+&i2c9 {
+	status = "okay";
+
+	ssif-bmc@10 {
+		compatible = "ssif-bmc";
+		reg = <0x10>;
+	};
+};
+
+&i2c10 {
+	status = "okay";
+  // CLKGEN
+};
+
+&i2c11 {
+	status = "okay";
+  // M2 Onboard
+};
+
+&i2c12 {
+	status = "okay";
+  // TODO: MUX PCA9546 to Slim SAS
+};
+
+&i2c13 {
+	status = "okay";
+  // TODO: I350, OCP, and Risers
+};
+
+&i2c14 {
+	status = "okay";
+  // CPLD
+};
+
+&i2c15 {
+	status = "okay";
+  // HDD BP
+};
+
+&adc0 {
+	ref_voltage = <2500>;
+	status = "okay";
+};
+
+&adc1 {
+	ref_voltage = <2500>;
+};
+
+&vhub {
+	status = "okay";
+};
+
+&video {
+	status = "okay";
+	memory-region = <&video_engine_memory>;
+};
+
+&gpio0 {
+    gpio-line-names =
+	/*A0-A7*/	"","","","","","","","",
+	/*B0-B7*/	"","","","","","","","",
+	/*C0-C7*/	"","","","","","","","",
+	/*D0-D7*/	"","","","","","","","",
+	/*E0-E7*/	"","bmc-pal-pwr-btn-n","","","","","","",
+	/*F0-F7*/	"","","","i2c-backup-sel","","","","",
+	/*G0-G7*/	"","","","","host0-sysreset-n","","","s0-plimit",
+	/*H0-H7*/	"uart3-mode1","uart2-mode1","uart1-mode1","","","","","",
+	/*I0-I7*/	"","","bmc-ready-n","host-online-en","","s0-vr-hot-n","","",
+	/*J0-J7*/	"","","","","","","","",
+	/*K0-K7*/	"","","","","","","","",
+	/*L0-L7*/	"","","","","","","","",
+	/*M0-M7*/	"","","","","","","","",
+	/*N0-N7*/	"","","","","","","","",
+	/*O0-O7*/	"","","","","","","","",
+	/*P0-P7*/	"","","","","","","","",
+	/*Q0-Q7*/	"","","","","","","","",
+	/*R0-R7*/	"","","","","","","","",
+	/*S0-S7*/	"","","","","","presence-cpu0","","spi0-backup-sel",
+	/*T0-T7*/	"","","","","","","","",
+	/*U0-U7*/	"","","","","","","","",
+	/*V0-V7*/	"","","","","host0-special-boot","","host0-shd-req-n","",
+	/*W0-W7*/	"","psu0-work","spi0-program-sel","","","bmc-s0-mem-efgh-sel","bmc-s0-mem-abcd-sel","ext-hightemp-n",
+	/*X0-X7*/	"host0-reboot-ack-n","","host0-ready","","","","","",
+	/*Y0-Y7*/	"","","bmc-i2c4-en","","","","","",
+	/*Z0-Z7*/	"","","","","","","","";
+
+    /* The pin GPIOY2 (BMC_I2C4_TEMP_FRU_FRTHDD_EN) is used to control the
+	 * accessing to i2c devices on i2c channel 3.
+	 * Set this pin to high to allow BMC access to i2c devices (temperature,
+	 * fru, frthdd) in the boot time */
+	temp_fru_frthdd_en {
+		gpio-hog;
+		gpios = <ASPEED_GPIO(Y, 2) GPIO_ACTIVE_HIGH>;
+		output-high;
+	};
+};
+
+&gpio1 {
+ 	gpio-line-names =
+	/*18A0-18A7*/	"","","","","","","","",
+	/*18B0-18B7*/	"","","","","","","","",
+	/*18C0-18C7*/	"","","","","","","","",
+	/*18D0-18D7*/	"","","s0-vr1-pmbus-sel","s0-vr0-pmbus-sel","","host0-shd-ack-n","","",
+	/*18E0-18E3*/	"s0-rtc-lock","","","";
+};
