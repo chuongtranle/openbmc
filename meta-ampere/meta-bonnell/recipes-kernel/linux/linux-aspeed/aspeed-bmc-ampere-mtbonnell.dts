@@ -302,7 +302,17 @@
 		status = "okay";
 		m25p,fast-read;
 		label = "pnor";
-		spi-max-frequency = <20000000>;
+		spi-max-frequency = <50000000>;
+    partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+			uefi@400000 {
+				reg = <0x400000 0x1C00000>;
+				label = "pnor-uefi";
+			};
+		};
+
 	};
 };
 
@@ -465,7 +475,7 @@
 	/*M0-M7*/	"","","","","","","","",
 	/*N0-N7*/	"","","","","","","","",
 	/*O0-O7*/	"","","","","","","","",
-	/*P0-P7*/	"","","","","","","","",
+	/*P0-P7*/	"","bmc-ok","","","","","","",
 	/*Q0-Q7*/	"","","","","","","","",
 	/*R0-R7*/	"","","","","","","","",
 	/*S0-S7*/	"","","","","","presence-cpu0","","spi0-backup-sel",

@@ -20,8 +20,6 @@ case "$1" in
 	;;
 	3) GPIO_UARTx_MODE="uart3-mode1"
 	;;
-	4) GPIO_UARTx_MODE="uart4-mode1"
-	;;
 	*) echo "Invalid UART port selection"
 		exit 1
 	;;
