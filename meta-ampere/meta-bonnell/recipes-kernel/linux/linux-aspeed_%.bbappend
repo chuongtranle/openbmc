@@ -1,5 +1,14 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
+SRC_URI = "\
+           git://github.com/ampere-openbmc/linux;protocol=https;branch=ampere \
+           file://defconfig \
+          "
+
+SRCREV="606a66d7a7ad773e418d6220ddb571695b3dc523"
+LINUX_VERSION = "6.6.60"
+KERNEL_VERSION_SANITY_SKIP = "1"
+
 SRC_URI += " \
             file://${MACHINE}.cfg \
             file://${KMACHINE}-bmc-ampere-${MACHINE}.dts \
