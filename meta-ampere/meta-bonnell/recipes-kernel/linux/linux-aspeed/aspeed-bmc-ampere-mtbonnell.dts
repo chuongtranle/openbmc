@@ -247,17 +247,6 @@
 	};
 };
 
-/*
-&mdio0 {
-	status = "okay";
-
-	ethphy0: ethernet-phy@0 {
-		compatible = "ethernet-phy-ieee802.3-c22";
-		reg = <0>;
-	};
-};
-*/
-
 &mac2 {
 	status = "okay";
 	pinctrl-names = "default";
@@ -303,16 +292,15 @@
 		m25p,fast-read;
 		label = "pnor";
 		spi-max-frequency = <50000000>;
-    partitions {
-			compatible = "fixed-partitions";
-			#address-cells = <1>;
-			#size-cells = <1>;
-			uefi@400000 {
-				reg = <0x400000 0x1C00000>;
-				label = "pnor-uefi";
-			};
-		};
-
+                partitions {
+	                compatible = "fixed-partitions";
+		        #address-cells = <1>;
+		        #size-cells = <1>;
+		        uefi@400000 {
+			        reg = <0x400000 0x1C00000>;
+			        label = "pnor-uefi";
+		        };
+	        };
 	};
 };
 
@@ -335,28 +323,59 @@
 
 &i2c0 {
 	status = "okay";
+
+        mp5023@40 {
+		compatible = "mps,mp5023";
+		reg = <0x40>;
+	};
+
+        mp5023@43 {
+		compatible = "mps,mp5023";
+		reg = <0x43>;
+	};
+
+        mp5023@44 {
+		compatible = "mps,mp5023";
+		reg = <0x44>;
+	};
+
+        mp5023@45 {
+		compatible = "mps,mp5023";
+		reg = <0x45>;
+	};
+
+        mp5023@41 {
+		compatible = "mps,mp5023";
+		reg = <0x41>;
+	};
+
+        mp5023@42 {
+		compatible = "mps,mp5023";
+		reg = <0x42>;
+	};
+
+        // TODO: Define ADC BMC POWER sensor ADC: 0x37
 };
 
 &i2c1 {
 	status = "okay";
 
-  // CPU SCP EEPROM
+        // CPU SCP EEPROM
 	eeprom@50 {
 		compatible = "atmel,24c64";
 		reg = <0x50>;
 		pagesize = <32>;
 	};
-
 };
 
 &i2c2 {
 	status = "okay";
 
-  // SCP Register Map
-	smpro@4f {
-    compatible = "ampere,smpro";
-    reg = <0x4f>;
-  };
+        // SCP Register Map
+        smpro@4f {
+                compatible = "ampere,smpro";
+                reg = <0x4f>;
+        };
 };
 
 &i2c3 {
@@ -368,8 +387,23 @@
 		pagesize = <32>;
 	};
 
-  // TODO: temperature sensor
+        m24c08_56: eeprom@56 {
+		compatible = "atmel,24c02";
+		reg = <0x56>;
+		pagesize = <16>;
+	};
 
+        tmp432@4d {
+                compatible = "ti,tmp75";
+                reg = <0x4d>;
+        };
+
+        tmp432@4e {
+                compatible = "ti,tmp75";
+                reg = <0x4e>;
+        };
+
+        // TODO: Define Temp sensor EMC1464T at 0x3c
 };
 
 &i2c4 {
@@ -383,22 +417,22 @@
 
 &i2c5 {
 	status = "okay";
-  // PDB SMBus
+        // PDB SMBUS
 };
 
 &i2c6 {
 	status = "okay";
-  // PSU FRU
+        // PDB PMBUS
 };
 
 &i2c7 {
 	status = "okay";
-  // DIMM
+        // DIMM
 };
 
 &i2c8 {
 	status = "okay";
-  // VRD
+        // VRD
 };
 
 &i2c9 {
@@ -412,32 +446,32 @@
 
 &i2c10 {
 	status = "okay";
-  // CLKGEN
+        // CLKGEN
 };
 
 &i2c11 {
 	status = "okay";
-  // M2 Onboard
+        // M2 Onboard
 };
 
 &i2c12 {
 	status = "okay";
-  // TODO: MUX PCA9546 to Slim SAS
+        // TODO: MUX PCA9546 to Slim SAS
 };
 
 &i2c13 {
 	status = "okay";
-  // TODO: I350, OCP, and Risers
+        // I350, OCP, and Risers
 };
 
 &i2c14 {
 	status = "okay";
-  // CPLD
+        // CPLD
 };
 
 &i2c15 {
 	status = "okay";
-  // HDD BP
+        // HDD BP
 };
 
 &adc0 {

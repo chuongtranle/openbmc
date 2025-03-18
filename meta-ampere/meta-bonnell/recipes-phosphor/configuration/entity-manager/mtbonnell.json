@@ -866,14 +866,7 @@
                 "Type": "TMP175"
             },
             {
-                "Address": "0x1f",
-                "Bus": 82,
-                "Name": "OCP_Local_Temp",
-                "Name1": "OCP_Temp",
-                "Type": "TMP421"
-            },
-            {
-                "Address": "0x58",
+                "Address": "0x59",
                 "Bus": 6,
                 "Labels": [
                     "temp1",
@@ -907,7 +900,7 @@
                 "vout1_Name": "PSU0_VOUTPUT"
             },
             {
-                "Address": "0x59",
+                "Address": "0x5A",
                 "Bus": 6,
                 "Labels": [
                     "temp1",
@@ -1161,10 +1154,10 @@
         },
         "xyz.openbmc_project.Inventory.Decorator.Asset": {
             "BuildDate": "$BOARD_MANUFACTURE_DATE",
-            "Manufacturer": "$PRODUCT_MANUFACTURER",
+            "Manufacturer": "$BOARD_MANUFACTURER",
             "Model": "$PRODUCT_PRODUCT_NAME $PRODUCT_VERSION",
-            "PartNumber": "$PRODUCT_PART_NUMBER",
-            "SerialNumber": "$PRODUCT_SERIAL_NUMBER"
+            "PartNumber": "$BOARD_PART_NUMBER",
+            "SerialNumber": "$BOARD_SERIAL_NUMBER"
         },
         "xyz.openbmc_project.Inventory.Decorator.AssetTag": {
             "AssetTag": "$PRODUCT_ASSET_TAG"
@@ -1176,9 +1169,6 @@
         },
         "xyz.openbmc_project.Inventory.Decorator.Revision": {
             "Version": "$PRODUCT_VERSION"
-        },
-        "xyz.openbmc_project.Inventory.Item.NetworkInterface": {
-            "MACAddress": "$BOARD_INFO_AM1"
         },
         "xyz.openbmc_project.Inventory.Item.System": {}
     },
@@ -1192,7 +1182,11 @@
             }
         ],
         "Name": "PowerSupply$ADDRESS % 82",
-        "Probe": "xyz.openbmc_project.FruDevice({'BUS': 6, 'ADDRESS': 82})",
+        "Probe": [
+            "xyz.openbmc_project.FruDevice({'BUS': 6, 'ADDRESS': 82})",
+            "AND",
+            "FOUND('Mt.Bonnell')"
+        ],
         "Type": "PowerSupply",
         "xyz.openbmc_project.Inventory.Decorator.Asset": {
             "Manufacturer": "$PRODUCT_MANUFACTURER",
@@ -1206,6 +1200,134 @@
         "xyz.openbmc_project.Inventory.Decorator.Replaceable": {
             "FieldReplaceable": false,
             "HotPluggable": false
+        }
+    },
+    {
+        "Exposes": [
+            {
+                "Address": "$address",
+                "Bus": "$bus",
+                "Name": "Mt.Bonnell_PDB FRU",
+                "Type": "EEPROM"
+            }
+        ],
+        "Name": "Mt.Bonnell_PDB",
+        "Probe": [
+            "xyz.openbmc_project.FruDevice({'BOARD_PRODUCT_NAME': '.*PDB.*'})",
+            "AND",
+            "FOUND('Mt.Bonnell')"
+        ],
+        "Type": "Board",
+        "xyz.openbmc_project.Inventory.Decorator.Asset": {
+            "BuildDate": "$BOARD_MANUFACTURE_DATE",
+            "Manufacturer": "$BOARD_MANUFACTURER",
+            "Model": "$BOARD_PRODUCT_NAME",
+            "PartNumber": "$BOARD_PART_NUMBER",
+            "SerialNumber": "$BOARD_SERIAL_NUMBER"
+        },
+        "xyz.openbmc_project.Inventory.Decorator.Replaceable": {
+            "FieldReplaceable": false,
+            "HotPluggable": false
+        },
+        "xyz.openbmc_project.Inventory.Decorator.Revision": {
+            "Version": "$BOARD_INFO_AM3"
+        }
+    },
+    {
+        "Exposes": [
+            {
+                "Address": "$address",
+                "Bus": "$bus",
+                "Name": "Mt.Bonnell_PDB_Interposer FRU",
+                "Type": "EEPROM"
+            }
+        ],
+        "Name": "Mt.Bonnell_PDB_Interposer",
+        "Probe": [
+            "xyz.openbmc_project.FruDevice({'BOARD_PRODUCT_NAME': '.*Power Interposer.*'})",
+            "AND",
+            "FOUND('Mt.Bonnell')"
+        ],
+        "Type": "Board",
+        "xyz.openbmc_project.Inventory.Decorator.Asset": {
+            "BuildDate": "$BOARD_MANUFACTURE_DATE",
+            "Manufacturer": "$BOARD_MANUFACTURER",
+            "Model": "$BOARD_PRODUCT_NAME",
+            "PartNumber": "$BOARD_PART_NUMBER",
+            "SerialNumber": "$BOARD_SERIAL_NUMBER"
+        },
+        "xyz.openbmc_project.Inventory.Decorator.Replaceable": {
+            "FieldReplaceable": false,
+            "HotPluggable": false
+        },
+        "xyz.openbmc_project.Inventory.Decorator.AssetTag": {
+            "AssetTag": "$BOARD_INFO_AM1"
+        },
+        "xyz.openbmc_project.Inventory.Decorator.VendorInformation": {
+            "CustomField1": "$BOARD_INFO_AM2",
+            "CustomField2": "$BOARD_INFO_AM3"
+        }
+    },
+    {
+        "Exposes": [
+            {
+                "Address": "$address",
+                "Bus": "$bus",
+                "Name": "Mt.Bonnell_Riser FRU",
+                "Type": "EEPROM"
+            }
+        ],
+        "Name": "Mt.Bonnell_Riser",
+        "Probe": [
+            "xyz.openbmc_project.FruDevice({'BOARD_PRODUCT_NAME': '.*Riser.*'})",
+            "AND",
+            "FOUND('Mt.Bonnell')"
+        ],
+        "Type": "Board",
+        "xyz.openbmc_project.Inventory.Decorator.Asset": {
+            "BuildDate": "$BOARD_MANUFACTURE_DATE",
+            "Manufacturer": "$BOARD_MANUFACTURER",
+            "Model": "$BOARD_PRODUCT_NAME",
+            "PartNumber": "$BOARD_PART_NUMBER",
+            "SerialNumber": "$BOARD_SERIAL_NUMBER"
+        },
+        "xyz.openbmc_project.Inventory.Decorator.Replaceable": {
+            "FieldReplaceable": false,
+            "HotPluggable": false
+        },
+        "xyz.openbmc_project.Inventory.Decorator.Revision": {
+            "Version": "$BOARD_INFO_AM3"
+        }
+    },
+    {
+        "Exposes": [
+            {
+                "Address": "$address",
+                "Bus": "$bus",
+                "Name": "Mt.Bonnell_HDD_BP FRU",
+                "Type": "EEPROM"
+            }
+        ],
+        "Name": "Mt.Bonnell_HDD_BP",
+        "Probe": [
+            "xyz.openbmc_project.FruDevice({'BOARD_PRODUCT_NAME': '.*E1.S 16 HDD BP.*'})",
+            "AND",
+            "FOUND('Mt.Bonnell')"
+        ],
+        "Type": "Board",
+        "xyz.openbmc_project.Inventory.Decorator.Asset": {
+            "BuildDate": "$BOARD_MANUFACTURE_DATE",
+            "Manufacturer": "$BOARD_MANUFACTURER",
+            "Model": "$BOARD_PRODUCT_NAME",
+            "PartNumber": "$BOARD_PART_NUMBER",
+            "SerialNumber": "$BOARD_SERIAL_NUMBER"
+        },
+        "xyz.openbmc_project.Inventory.Decorator.Replaceable": {
+            "FieldReplaceable": false,
+            "HotPluggable": false
+        },
+        "xyz.openbmc_project.Inventory.Decorator.Revision": {
+            "Version": "$BOARD_INFO_AM3"
         }
     }
 ]
