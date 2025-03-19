@@ -1,1 +1,1 @@
-# RDEPENDS:${PN}-system:remove = "ampere-fault-monitor"
+RDEPENDS:${PN}-system:append = "ampere-misc"

@@ -1,5 +1,5 @@
 [Unit]
-Description = Mt.Jade Platform Initialization
+Description = Mt. Bonnell Platform Initialization
 
 [Service]
 Restart=no
