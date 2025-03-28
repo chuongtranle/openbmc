@@ -1,0 +1,33 @@
+From 85a50795495cd883a6900429c6cbad9c0c465682 Mon Sep 17 00:00:00 2001
+From: Chuong Tran <chuong@os.amperecomputing.com>
+Date: Fri, 28 Mar 2025 12:25:20 +0700
+Subject: [PATCH] Increase dropbear timeout to 60s
+
+Mt. Bonnell BMC uses shared NCSI with CPU. It was observed that
+obmc-console connection drop when CPU is powered on/off or PCIe
+initializes that affects NSCI interface of BMC. Hence, increasing the
+timeout from 5 seconds to 60 seconds solved the drop connection issue.
+
+Upstream-Status: Inappropriate oe specific
+
+Signed-off-by: Chuong Tran <chuong@os.amperecomputing.com>
+---
+ conf/obmc-console-ssh@.service.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/conf/obmc-console-ssh@.service.in b/conf/obmc-console-ssh@.service.in
+index 7ea7d35..34a0302 100644
+--- a/conf/obmc-console-ssh@.service.in
++++ b/conf/obmc-console-ssh@.service.in
+@@ -9,7 +9,7 @@ Environment="DROPBEAR_RSAKEY_DIR=/etc/dropbear"
+ EnvironmentFile=/etc/obmc-console/dropbear.env
+ EnvironmentFile=-/etc/obmc-console/dropbear.%i.env
+ EnvironmentFile=-/etc/default/obmc-console-client
+-ExecStart=/usr/sbin/dropbear -K 5 \
++ExecStart=/usr/sbin/dropbear -K 60 \
+                              -r ${DROPBEAR_RSAKEY_DIR}/dropbear_rsa_host_key \
+                              -r ${DROPBEAR_RSAKEY_DIR}/dropbear_ecdsa_host_key \
+                              -r ${DROPBEAR_RSAKEY_DIR}/dropbear_ed25519_host_key \
+-- 
+2.25.1
+

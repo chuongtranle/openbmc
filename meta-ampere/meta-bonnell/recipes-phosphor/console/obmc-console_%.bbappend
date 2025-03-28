@@ -6,6 +6,7 @@ OBMC_CONSOLE_TTYS = "ttyS0 ttyS1 ttyS2"
 CONSOLE_CLIENT = "2200 2201 2202"
 
 SRC_URI += " \
+             file://0001-Increase-dropbear-timeout-to-60s.patch \
              ${@compose_list(d, 'CONSOLE_SERVER_CONF_FMT', 'OBMC_CONSOLE_TTYS')} \
              ${@compose_list(d, 'CONSOLE_CLIENT_CONF_FMT', 'CONSOLE_CLIENT')} \
            "
