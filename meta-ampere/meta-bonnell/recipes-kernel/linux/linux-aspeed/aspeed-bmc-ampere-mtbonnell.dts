@@ -516,7 +516,7 @@
 	/*T0-T7*/	"","","","","","","","",
 	/*U0-U7*/	"","","","","","","","",
 	/*V0-V7*/	"","","","","host0-special-boot","","host0-shd-req-n","",
-	/*W0-W7*/	"","psu0-work","spi0-program-sel","","","bmc-s0-mem-efgh-sel","bmc-s0-mem-abcd-sel","ext-hightemp-n",
+	/*W0-W7*/	"i2c-program-sel","psu0-work","spi0-program-sel","","","bmc-s0-mem-efgh-sel","bmc-s0-mem-abcd-sel","ext-hightemp-n",
 	/*X0-X7*/	"host0-reboot-ack-n","","host0-ready","","","","","",
 	/*Y0-Y7*/	"","","bmc-i2c4-en","","","","","",
 	/*Z0-Z7*/	"","","","","","","","";
