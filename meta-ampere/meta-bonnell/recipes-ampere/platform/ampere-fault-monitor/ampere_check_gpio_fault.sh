@@ -62,11 +62,7 @@ blink_gpio_fault_led() {
 
 	socket=$1
 
-	socket1_present=15
-	socket1_status=1
-
-	S0_fault_gpio=73
-	S1_fault_gpio=201
+	S0_fault_gpio=100
 
 map_event_name() {
 	case $curr_pattern in
@@ -196,13 +192,6 @@ init_sysfs_fault_gpio() {
 # init
 if [ "$socket" == "0" ]; then
 	fault_gpio=$S0_fault_gpio
-else
-	socket1_status=$(gpioget 0 "$socket1_present")
-	if [ "$socket1_status" == 1 ]; then
-		echo "socket 1 not present"
-		exit 1
-	fi
-	fault_gpio=$S1_fault_gpio
 fi
 
 init_sysfs_fault_gpio
