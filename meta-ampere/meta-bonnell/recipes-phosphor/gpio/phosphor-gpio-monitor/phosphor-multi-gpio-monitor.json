@@ -36,12 +36,5 @@
         "EventMon": "FALLING",
         "Target": "ampere_scp_failover.service",
         "Continue": true
-    },
-    {
-        "Name": "PSU1_VIN_GOOD",
-        "LineName": "ps0-vin-good",
-        "EventMon": "RISING",
-        "Target": "psu_hotswap_reset@0.service",
-        "Continue": true
     }
 ]
