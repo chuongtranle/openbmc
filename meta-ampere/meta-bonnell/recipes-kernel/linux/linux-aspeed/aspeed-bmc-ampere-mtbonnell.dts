@@ -197,7 +197,11 @@
 		reg = <0x42>;
 	};
 
-        // TODO: Define ADC BMC POWER sensor ADC: 0x37
+	adc_i2c_0_37: adc@37 {
+		compatible = "ti,adc128d818";
+		reg = <0x37>;
+		ti,mode = /bits/ 8 <1>;
+	};
 };
 
 &i2c1 {
@@ -236,17 +240,21 @@
 		pagesize = <16>;
 	};
 
-        tmp432@4d {
+        tmp1@4d {
                 compatible = "ti,tmp75";
                 reg = <0x4d>;
         };
 
-        tmp432@4e {
+        tmp2@4e {
                 compatible = "ti,tmp75";
                 reg = <0x4e>;
         };
 
-        // TODO: Define Temp sensor EMC1464T at 0x3c
+	tmp3@3c {
+                compatible = "microchip,emc1413";
+                reg = <0x3c>;
+        };
+
 };
 
 &i2c4 {
@@ -356,7 +364,7 @@
 	/*P0-P7*/	"","bmc-ok","","","","","","led-identify",
 	/*Q0-Q7*/	"","","","","","","","",
 	/*R0-R7*/	"","","","","","","","",
-	/*S0-S7*/	"","","","","","presence-cpu0","","spi0-backup-sel",
+	/*S0-S7*/	"","bmc-vbat-sen-en","","","","presence-cpu0","","spi0-backup-sel",
 	/*T0-T7*/	"","","","","","","","",
 	/*U0-U7*/	"","","","","","","","",
 	/*V0-V7*/	"","","","","host0-special-boot","","host0-shd-req-n","",
