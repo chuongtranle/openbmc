@@ -75,7 +75,7 @@
             },
             {
                 "CPURequired": 0,
-                "Index": 2,
+                "Index": 1,
                 "Name": "S0_0V75_PCP",
                 "PollRate": 1,
                 "PowerState": "On",
@@ -98,7 +98,7 @@
             },
             {
                 "CPURequired": 0,
-                "Index": 4,
+                "Index": 2,
                 "Name": "S0_1V2_VDDQ0123",
                 "PollRate": 1,
                 "PowerState": "ChassisOn",
@@ -121,7 +121,7 @@
             },
             {
                 "CPURequired": 0,
-                "Index": 6,
+                "Index": 3,
                 "Name": "S0_0V6_VTT0123",
                 "PollRate": 1,
                 "PowerState": "ChassisOn",
@@ -144,7 +144,7 @@
             },
             {
                 "CPURequired": 0,
-                "Index": 8,
+                "Index": 4,
                 "Name": "S0_2V5_VPP0123",
                 "PollRate": 1,
                 "PowerState": "ChassisOn",
@@ -167,7 +167,7 @@
             },
             {
                 "CPURequired": 0,
-                "Index": 10,
+                "Index": 5,
                 "Name": "S0_1V2_VDDQ4567",
                 "PollRate": 1,
                 "PowerState": "ChassisOn",
@@ -190,7 +190,7 @@
             },
             {
                 "CPURequired": 0,
-                "Index": 12,
+                "Index": 6,
                 "Name": "S0_0V6_VTT4567",
                 "PollRate": 1,
                 "PowerState": "ChassisOn",
@@ -213,7 +213,7 @@
             },
             {
                 "CPURequired": 0,
-                "Index": 14,
+                "Index": 7,
                 "Name": "S0_2V5_VPP4567",
                 "PollRate": 1,
                 "PowerState": "ChassisOn",
@@ -236,7 +236,7 @@
             },
             {
                 "CPURequired": 0,
-                "Index": 16,
+                "Index": 8,
                 "Name": "S0_0V85_RCA",
                 "PollRate": 1,
                 "PowerState": "ChassisOn",
@@ -259,7 +259,7 @@
             },
             {
                 "CPURequired": 0,
-                "Index": 18,
+                "Index": 9,
                 "Name": "S0_1V8_VDDH",
                 "PollRate": 1,
                 "PowerState": "ChassisOn",
@@ -282,7 +282,7 @@
             },
             {
                 "CPURequired": 0,
-                "Index": 20,
+                "Index": 10,
                 "Name": "S0_1V5_VDDH",
                 "PollRate": 1,
                 "PowerState": "ChassisOn",
@@ -305,7 +305,7 @@
             },
             {
                 "CPURequired": 0,
-                "Index": 22,
+                "Index": 11,
                 "Name": "S0_1V8_SOC",
                 "PollRate": 1,
                 "PowerState": "ChassisOn",
@@ -328,7 +328,7 @@
             },
             {
                 "CPURequired": 0,
-                "Index": 24,
+                "Index": 12,
                 "Name": "S0_1V8_PCP",
                 "PollRate": 1,
                 "PowerState": "On",
@@ -351,7 +351,7 @@
             },
             {
                 "CPURequired": 0,
-                "Index": 26,
+                "Index": 13,
                 "Name": "S0_3V3_SOC",
                 "PollRate": 1,
                 "PowerState": "ChassisOn",
@@ -368,6 +368,52 @@
                         "Name": "lower critical",
                         "Severity": 1,
                         "Value": 2.32
+                    }
+                ],
+                "Type": "ADC"
+            },
+            {
+                "CPURequired": 0,
+                "Index": 14,
+                "Name": "S0_3V3_VRD",
+                "PollRate": 1,
+                "PowerState": "ChassisOn",
+                "ScaleFactor": 0.3333,
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 3.96
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 2.32
+                    }
+                ],
+                "Type": "ADC"
+            },
+            {
+                "CPURequired": 0,
+                "Index": 15,
+                "Name": "S0_5V_VRD",
+                "PollRate": 1,
+                "PowerState": "ChassisOn",
+                "ScaleFactor": 0.2537,
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 6
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 3.5
                     }
                 ],
                 "Type": "ADC"
