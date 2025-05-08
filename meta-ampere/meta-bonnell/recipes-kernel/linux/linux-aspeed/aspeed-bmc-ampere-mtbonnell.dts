@@ -81,190 +81,12 @@
 		regulator-always-on;
 	};
 
-	gpioS1mux: mux-controller {
-		compatible = "gpio-mux";
-		#mux-control-cells = <0>;
-		mux-gpios = <&gpio0 ASPEED_GPIO(S, 1) GPIO_ACTIVE_LOW>;
-	};
-
-	adc0mux: adc0mux {
-		compatible = "io-channel-mux";
-		io-channels = <&adc0 0>;
-		#io-channel-cells = <1>;
-		io-channel-names = "parent";
-		mux-controls = <&gpioS1mux>;
-		settle-time-us = <10000>;
-		channels = "s0", "s1";
-	};
-
-	adc1mux: adc1mux {
-		compatible = "io-channel-mux";
-		io-channels = <&adc0 1>;
-		#io-channel-cells = <1>;
-		io-channel-names = "parent";
-		mux-controls = <&gpioS1mux>;
-		settle-time-us = <10000>;
-		channels = "s0", "s1";
-	};
-
-	adc2mux: adc2mux {
-		compatible = "io-channel-mux";
-		io-channels = <&adc0 2>;
-		#io-channel-cells = <1>;
-		io-channel-names = "parent";
-		mux-controls = <&gpioS1mux>;
-		settle-time-us = <10000>;
-		channels = "s0", "s1";
-	};
-
-	adc3mux: adc3mux {
-		compatible = "io-channel-mux";
-		io-channels = <&adc0 3>;
-		#io-channel-cells = <1>;
-		io-channel-names = "parent";
-		mux-controls = <&gpioS1mux>;
-		settle-time-us = <10000>;
-		channels = "s0", "s1";
-	};
-
-	adc4mux: adc4mux {
-		compatible = "io-channel-mux";
-		io-channels = <&adc0 4>;
-		#io-channel-cells = <1>;
-		io-channel-names = "parent";
-		mux-controls = <&gpioS1mux>;
-		settle-time-us = <10000>;
-		channels = "s0", "s1";
-	};
-
-	adc5mux: adc5mux {
-		compatible = "io-channel-mux";
-		io-channels = <&adc0 5>;
-		#io-channel-cells = <1>;
-		io-channel-names = "parent";
-		mux-controls = <&gpioS1mux>;
-		settle-time-us = <10000>;
-		channels = "s0", "s1";
-	};
-
-	adc6mux: adc6mux {
-		compatible = "io-channel-mux";
-		io-channels = <&adc0 6>;
-		#io-channel-cells = <1>;
-		io-channel-names = "parent";
-		mux-controls = <&gpioS1mux>;
-		settle-time-us = <10000>;
-		channels = "s0", "s1";
-	};
-
-	adc7mux: adc7mux {
-		compatible = "io-channel-mux";
-		io-channels = <&adc0 7>;
-		#io-channel-cells = <1>;
-		io-channel-names = "parent";
-		mux-controls = <&gpioS1mux>;
-		settle-time-us = <10000>;
-		channels = "s0", "s1";
-	};
-
-	adc8mux: adc8mux {
-		compatible = "io-channel-mux";
-		io-channels = <&adc1 0>;
-		#io-channel-cells = <1>;
-		io-channel-names = "parent";
-		mux-controls = <&gpioS1mux>;
-		settle-time-us = <10000>;
-		channels = "s0", "s1";
-	};
-
-	adc9mux: adc9mux {
-		compatible = "io-channel-mux";
-		io-channels = <&adc1 1>;
-		#io-channel-cells = <1>;
-		io-channel-names = "parent";
-		mux-controls = <&gpioS1mux>;
-		settle-time-us = <10000>;
-		channels = "s0", "s1";
-	};
-
-	adc10mux: adc10mux {
-		compatible = "io-channel-mux";
-		io-channels = <&adc1 2>;
-		#io-channel-cells = <1>;
-		io-channel-names = "parent";
-		mux-controls = <&gpioS1mux>;
-		settle-time-us = <10000>;
-		channels = "s0", "s1";
-	};
-
-	adc11mux: adc11mux {
-		compatible = "io-channel-mux";
-		io-channels = <&adc1 3>;
-		#io-channel-cells = <1>;
-		io-channel-names = "parent";
-		mux-controls = <&gpioS1mux>;
-		settle-time-us = <10000>;
-		channels = "s0", "s1";
-	};
-
-	adc12mux: adc12mux {
-		compatible = "io-channel-mux";
-		io-channels = <&adc1 4>;
-		#io-channel-cells = <1>;
-		io-channel-names = "parent";
-		mux-controls = <&gpioS1mux>;
-		settle-time-us = <10000>;
-		channels = "s0", "s1";
-	};
-
-	adc13mux: adc13mux {
-		compatible = "io-channel-mux";
-		io-channels = <&adc1 5>;
-		#io-channel-cells = <1>;
-		io-channel-names = "parent";
-		mux-controls = <&gpioS1mux>;
-		settle-time-us = <10000>;
-		channels = "s0", "s1";
-	};
-
-	adc14mux: adc14mux {
-		compatible = "io-channel-mux";
-		io-channels = <&adc1 6>;
-		#io-channel-cells = <1>;
-		io-channel-names = "parent";
-		mux-controls = <&gpioS1mux>;
-		settle-time-us = <10000>;
-		channels = "s0", "s1";
-	};
-
-	adc15mux: adc15mux {
-		compatible = "io-channel-mux";
-		io-channels = <&adc1 7>;
-		#io-channel-cells = <1>;
-		io-channel-names = "parent";
-		mux-controls = <&gpioS1mux>;
-		settle-time-us = <10000>;
-		channels = "s0", "s1";
-	};
-
 	iio-hwmon {
 		compatible = "iio-hwmon";
-		io-channels =	<&adc0mux 0>, <&adc0mux 1>,
-				<&adc1mux 0>, <&adc1mux 1>,
-				<&adc2mux 0>, <&adc2mux 1>,
-				<&adc3mux 0>, <&adc3mux 1>,
-				<&adc4mux 0>, <&adc4mux 1>,
-				<&adc5mux 0>, <&adc5mux 1>,
-				<&adc6mux 0>, <&adc6mux 1>,
-				<&adc7mux 0>, <&adc7mux 1>,
-				<&adc8mux 0>, <&adc8mux 1>,
-				<&adc9mux 0>, <&adc9mux 1>,
-				<&adc10mux 0>, <&adc10mux 1>,
-				<&adc11mux 0>, <&adc11mux 1>,
-				<&adc12mux 0>, <&adc12mux 1>,
-				<&adc13mux 0>, <&adc13mux 1>,
-				<&adc14mux 0>, <&adc14mux 1>,
-				<&adc15mux 0>, <&adc15mux 1>;
+		io-channels =   <&adc0 0>, <&adc0 1>, <&adc0 2>, <&adc0 3>,
+				<&adc0 4>, <&adc0 5>, <&adc0 6>, <&adc0 7>,
+				<&adc1 0>, <&adc1 1>, <&adc1 2>, <&adc1 3>,
+				<&adc1 4>, <&adc1 5>, <&adc1 6>, <&adc1 7>;
 	};
 };
 
@@ -502,6 +324,7 @@
 
 &adc1 {
 	ref_voltage = <2500>;
+	status = "okay";
 };
 
 &vhub {
