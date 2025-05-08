@@ -130,6 +130,43 @@
             ]
         },
         "Expression": "sumIgnoreNaN(P1, P2)"
+    },
+    {
+        "Desc": {
+            "Name": "P12V_EDGE_OCP_EFUSE_Curr",
+            "SensorType": "current"
+        },
+        "Threshold": {
+            "CriticalHigh": 13.2,
+            "CriticalLow": 10.8,
+            "WarningHigh": 12.84,
+            "WarningLow": 11.16
+        },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/chassis/Mt_Bonnell"
+            ],
+            [
+                "inventory",
+                "sensors",
+                "/xyz/openbmc_project/inventory/system/chassis/Mt_Bonnell"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "P1",
+                    "Desc": {
+                        "Name": "P12V_OCP_ISENSE",
+                        "SensorType": "voltage"
+                    }
+                }
+            ]
+        },
+        "Expression": "P1 * 10"
     }
 ]
 
