@@ -37,6 +37,7 @@ check_psu_failed() {
     fi
 }
 
+exit 0
 # Daemon start
 while true
 do
