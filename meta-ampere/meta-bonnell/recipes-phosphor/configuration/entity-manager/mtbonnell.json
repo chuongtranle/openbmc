@@ -2,55 +2,6 @@
     {
         "Exposes": [
             {
-                "Index": 28,
-                "Name": "3V3_SB",
-                "PollRate": 1,
-                "ScaleFactor": 0.3333,
-                "Thresholds": [
-                    {
-                        "Direction": "greater than",
-                        "Name": "upper critical",
-                        "Severity": 1,
-                        "Value": 3.96
-                    },
-                    {
-                        "Direction": "less than",
-                        "Name": "lower critical",
-                        "Severity": 1,
-                        "Value": 2.32
-                    }
-                ],
-                "Type": "ADC"
-            },
-            {
-                "BridgeGpio": [
-                    {
-                        "Name": "rtc-battery-voltage-read-enable",
-                        "Polarity": "High",
-                        "SetupTime": 0.02
-                    }
-                ],
-                "Index": 29,
-                "Name": "VBAT_RTC",
-                "PollRate": 10,
-                "ScaleFactor": 0.3333,
-                "Thresholds": [
-                    {
-                        "Direction": "greater than",
-                        "Name": "upper critical",
-                        "Severity": 1,
-                        "Value": 3.564
-                    },
-                    {
-                        "Direction": "less than",
-                        "Name": "lower critical",
-                        "Severity": 1,
-                        "Value": 2.106
-                    }
-                ],
-                "Type": "ADC"
-            },
-            {
                 "Address": "0x37",
                 "BridgeGpio": [
                     {
@@ -59,6 +10,11 @@
                         "Polarity": "High"
                     }
                 ],
+                "Polling":
+                    {
+                        "Label": "in7",
+                        "PollRate": 20
+                    },
                 "Bus": 0,
                 "Labels": [
                     "in0",
@@ -254,34 +210,6 @@
                     "Name": "lower non critical",
                     "Severity": 0,
                     "Value": 4.65
-                },
-                {
-                    "Direction": "greater than",
-                    "Label": "in6",
-                    "Name": "upper critical",
-                    "Severity": 1,
-                    "Value": 13.2
-                },
-                {
-                    "Direction": "less than",
-                    "Label": "in6",
-                    "Name": "lower critical",
-                    "Severity": 1,
-                    "Value": 10.8
-                },
-                {
-                    "Direction": "greater than",
-                    "Label": "in6",
-                    "Name": "upper non critical",
-                    "Severity": 0,
-                    "Value": 12.84
-                },
-                {
-                    "Direction": "less than",
-                    "Label": "in6",
-                    "Name": "lower non critical",
-                    "Severity": 0,
-                    "Value": 11.16
                 },
                 {
                     "Direction": "greater than",

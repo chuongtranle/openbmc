@@ -1,0 +1,362 @@
+From e2d22ab13524e974e4627f6f62f9adcb74cccd36 Mon Sep 17 00:00:00 2001
+From: Tam Chi Nguyen <tamng@amperecomputing.com>
+Date: Mon, 12 May 2025 07:02:23 +0000
+Subject: [PATCH] dbus-sensors: Add support for PSU channels controlled by GPIO
+
+In case a channel has a bridge circuit, we have to turn the bridge on
+prior to reading a value at least for one scan cycle to get a valid
+value. The BridgeGpio option can be enabled in the entity manager
+JSON similar to ADC sensor's implementation.
+
+This commit also support channel custom PollRate for single channel using
+Polling configuration. This allows to set poll rate of VBAT sensor differ with
+PSU's poll rate.
+
+Tested:
+1. Add BridgeGpio option in VBAT configuration.
+2. Battery voltage reads close to zero when BridgeGpio is not enabled.
+3. After BridgeGpio is enabled the reading is as expected around 3V.
+
+Signed-off-by: Tam Chi Nguyen <tamng@amperecomputing.com>
+---
+ src/PSUSensor.cpp     |  71 +++++++++++++++++++++++------
+ src/PSUSensor.hpp     |  56 ++++++++++++++++++++++-
+ src/PSUSensorMain.cpp | 101 +++++++++++++++++++++++++++++++++++++++++-
+ src/meson.build       |   1 +
+ 4 files changed, 213 insertions(+), 16 deletions(-)
+
+diff --git a/src/PSUSensor.cpp b/src/PSUSensor.cpp
+index 4d410fe..b83cda1 100644
+--- a/src/PSUSensor.cpp
++++ b/src/PSUSensor.cpp
+@@ -53,13 +53,14 @@ PSUSensor::PSUSensor(
+     const std::string& sensorConfiguration, const PowerState& powerState,
+     const std::string& sensorUnits, unsigned int factor, double max, double min,
+     double offset, const std::string& label, size_t tSize, double pollRate,
+-    const std::shared_ptr<I2CDevice>& i2cDevice) :
++    const std::shared_ptr<I2CDevice>& i2cDevice,
++    std::optional<BridgeGpio>&& bridgeGpio) :
+     Sensor(escapeName(sensorName), std::move(thresholdsIn), sensorConfiguration,
+            objectType, false, false, max, min, conn, powerState),
+     i2cDevice(i2cDevice), objServer(objectServer),
+     inputDev(io, path, boost::asio::random_access_file::read_only),
+     waitTimer(io), path(path), sensorFactor(factor), sensorOffset(offset),
+-    thresholdTimer(io)
++    thresholdTimer(io), bridgeGpio(std::move(bridgeGpio))
+ {
+     buffer = std::make_shared<std::array<char, 128>>();
+     std::string unitPath = sensor_paths::getPathForUnits(sensorUnits);
+@@ -168,18 +169,55 @@ void PSUSensor::setupRead()
+     // the actual data structure, so that we can always append the null
+     // terminator.  This can go away once std::from_chars<double> is available
+     // in the standard
+-    inputDev.async_read_some_at(
+-        0, boost::asio::buffer(buffer->data(), buffer->size() - 1),
+-        [weak, buffer{buffer}](const boost::system::error_code& ec,
+-                               size_t bytesRead) {
+-            std::shared_ptr<PSUSensor> self = weak.lock();
+-            if (!self)
+-            {
+-                return;
+-            }
+-
+-            self->handleResponse(ec, bytesRead);
+-        });
++    if (bridgeGpio.has_value())
++    {
++        (*bridgeGpio).set(1);
++        // In case a channel has a bridge circuit,we have to turn the bridge on
++        // prior to reading a value at least for one scan cycle to get a valid
++        // value. Guarantee that the HW signal can be stable, the HW signal
++        // could be instability.
++        waitTimer.expires_after(
++            std::chrono::milliseconds(bridgeGpio->setupTimeMs));
++        waitTimer.async_wait(
++            [weak, this](const boost::system::error_code& ec) {
++                std::shared_ptr<PSUSensor> self = weak.lock();
++                if (ec == boost::asio::error::operation_aborted)
++                {
++                    return; // we're being canceled
++                }
++
++                if (self)
++                {
++                    inputDev.async_read_some_at(
++                        0, boost::asio::buffer(buffer->data(), buffer->size() - 1),
++                        [weak, buffer{buffer}](const boost::system::error_code& ec,
++                                               size_t bytesRead) {
++                            std::shared_ptr<PSUSensor> self = weak.lock();
++                            if (!self)
++                            {
++                                return;
++                            }
++
++                            self->handleResponse(ec, bytesRead);
++                        });
++                }
++            });
++    }
++    else
++    {
++        inputDev.async_read_some_at(
++            0, boost::asio::buffer(buffer->data(), buffer->size() - 1),
++            [weak, buffer{buffer}](const boost::system::error_code& ec,
++                                   size_t bytesRead) {
++                std::shared_ptr<PSUSensor> self = weak.lock();
++                if (!self)
++                {
++                    return;
++                }
++
++                self->handleResponse(ec, bytesRead);
++            });
++    }
+ }
+ 
+ void PSUSensor::restartRead()
+@@ -241,6 +279,11 @@ void PSUSensor::handleResponse(const boost::system::error_code& err,
+         incrementError();
+     }
+ 
++    if (bridgeGpio.has_value())
++    {
++        (*bridgeGpio).set(0);
++    }
++
+     restartRead();
+ }
+ 
+diff --git a/src/PSUSensor.hpp b/src/PSUSensor.hpp
+index 09601f8..46af38b 100644
+--- a/src/PSUSensor.hpp
++++ b/src/PSUSensor.hpp
+@@ -10,8 +10,60 @@
+ 
+ #include <array>
+ #include <memory>
++#include <optional>
+ #include <string>
+ #include <utility>
++#include <gpiod.hpp>
++
++class BridgeGpio
++{
++  public:
++    BridgeGpio(const std::string& name, const int polarity,
++               const float setupTime) :
++        setupTimeMs(static_cast<unsigned int>(setupTime * 1000))
++    {
++        line = gpiod::find_line(name);
++        if (!line)
++        {
++            std::cerr << "Error finding gpio: " << name << "\n";
++        }
++        else
++        {
++            try
++            {
++                line.request(
++                    {"psusensor", gpiod::line_request::DIRECTION_OUTPUT,
++                     polarity == gpiod::line::ACTIVE_HIGH
++                         ? 0
++                         : gpiod::line_request::FLAG_ACTIVE_LOW});
++            }
++            catch (const std::system_error& exc)
++            {
++                std::cerr << "Error requesting gpio: " << name << ": " << exc.what() << "\n";
++            }
++        }
++    }
++
++    void set(int value)
++    {
++        if (line)
++        {
++            try
++            {
++                line.set_value(value);
++            }
++            catch (const std::system_error& exc)
++            {
++                std::cerr << "Error set_value: " << exc.what() << "\n";
++            }
++        }
++    }
++
++    unsigned int setupTimeMs;
++
++  private:
++    gpiod::line line;
++};
+ 
+ class PSUSensor : public Sensor, public std::enable_shared_from_this<PSUSensor>
+ {
+@@ -25,7 +77,8 @@ class PSUSensor : public Sensor, public std::enable_shared_from_this<PSUSensor>
+               const PowerState& powerState, const std::string& sensorUnits,
+               unsigned int factor, double max, double min, double offset,
+               const std::string& label, size_t tSize, double pollRate,
+-              const std::shared_ptr<I2CDevice>& i2cDevice);
++              const std::shared_ptr<I2CDevice>& i2cDevice,
++	      std::optional<BridgeGpio>&& bridgeGpio);
+     ~PSUSensor() override;
+     void setupRead();
+     void activate(const std::string& newPath,
+@@ -55,6 +108,7 @@ class PSUSensor : public Sensor, public std::enable_shared_from_this<PSUSensor>
+     void handleResponse(const boost::system::error_code& err, size_t bytesRead);
+     void checkThresholds() override;
+     unsigned int sensorPollMs = defaultSensorPollMs;
++    std::optional<BridgeGpio> bridgeGpio;
+ 
+     static constexpr size_t warnAfterErrorCount = 10;
+ 
+diff --git a/src/PSUSensorMain.cpp b/src/PSUSensorMain.cpp
+index 53d8164..a231769 100644
+--- a/src/PSUSensorMain.cpp
++++ b/src/PSUSensorMain.cpp
+@@ -62,6 +62,7 @@
+ 
+ static constexpr bool debug = false;
+ static std::regex i2cDevRegex(R"((\/i2c\-\d+\/\d+-[a-fA-F0-9]{4,4})(\/|$))");
++static constexpr float gpioBridgeSetupTimeDefault = 1.0;
+ 
+ static const I2CDeviceTypeMap sensorTypes{
+     {"ADC128D818", I2CDeviceType{"adc128d818", true}},
+@@ -295,6 +296,49 @@ static void checkPWMSensor(
+         name, pwmPathStr, dbusConnection, objectServer, objPath, "PSU");
+ }
+ 
++static float checkPolling(
++    const SensorData& sensorData,
++    const std::string* matchLabel,
++    const float defaultValue)
++{
++    float returnPollRate = defaultValue;
++    for (const auto& [intf, cfg] : sensorData)
++    {
++        if (intf.find("Polling") == std::string::npos)
++        {
++            continue;
++        }
++        std::string label;
++        auto findLabel = cfg.find("Label");
++        if (findLabel != cfg.end())
++        {
++            label = std::visit(VariantToStringVisitor(),
++                                   findLabel->second);
++        }
++        if (label != *matchLabel)
++        {
++            continue;
++        }
++        float pollRate;
++        auto findPollRate = cfg.find("PollRate");
++        if (findPollRate != cfg.end())
++        {
++            pollRate = std::visit(VariantToFloatVisitor(),
++                                  findPollRate->second);
++        }
++
++        if constexpr (debug)
++        {
++            std::cerr << "Custom PollRate of " << *matchLabel << ": " <<
++                        pollRate << "\n";
++        }
++        returnPollRate = pollRate;
++
++    }
++
++    return returnPollRate;
++}
++
+ static void createSensorsCallback(
+     boost::asio::io_context& io, sdbusplus::asio::object_server& objectServer,
+     std::shared_ptr<sdbusplus::asio::connection>& dbusConnection,
+@@ -945,6 +989,8 @@ static void createSensorsCallback(
+             }
+             // destruct existing one first if already created
+ 
++            float globalPollRate = pollRate;
++            pollRate = checkPolling(*sensorData, &labelHead, pollRate);
+             auto& sensor = sensors[sensorName];
+             if (!activateOnly)
+             {
+@@ -957,13 +1003,66 @@ static void createSensorsCallback(
+             }
+             else
+             {
++                std::optional<BridgeGpio> bridgeGpio;
++                for (const SensorBaseConfiguration& suppConfig : *sensorData)
++                {
++
++                    if (suppConfig.first.find("BridgeGpio") !=
++                        std::string::npos)
++                    {
++                        auto findName = suppConfig.second.find("Name");
++                        if (findName != suppConfig.second.end())
++                        {
++                            std::string gpioName = std::visit(
++                                VariantToStringVisitor(), findName->second);
++                            int polarity = gpiod::line::ACTIVE_HIGH;
++
++                            auto findPolarity =
++                                suppConfig.second.find("Polarity");
++                            if (findPolarity != suppConfig.second.end())
++                            {
++                                if (std::string("Low") ==
++                                    std::visit(VariantToStringVisitor(),
++                                               findPolarity->second))
++                                {
++                                    polarity = gpiod::line::ACTIVE_LOW;
++                                }
++                            }
++                            float setupTime = gpioBridgeSetupTimeDefault;
++                            auto findSetupTime =
++                                suppConfig.second.find("SetupTime");
++                            if (findSetupTime != suppConfig.second.end())
++                            {
++                                setupTime = std::visit(VariantToFloatVisitor(),
++                                                       findSetupTime->second);
++                            }
++
++                            std::string label;
++                            auto findLabel =
++                                suppConfig.second.find("Label");
++                            if (findLabel != suppConfig.second.end())
++                            {
++                                label = std::visit(VariantToStringVisitor(),
++                                                       findLabel->second);
++                            }
++                            if (labelHead == label) {
++                                bridgeGpio =
++                                    BridgeGpio(gpioName, polarity, setupTime);
++                            }
++                        }
++                        break;
++                    }
++                }
++
++
+                 sensors[sensorName] = std::make_shared<PSUSensor>(
+                     sensorPathStr, sensorType, objectServer, dbusConnection, io,
+                     sensorName, std::move(sensorThresholds), *interfacePath,
+                     readState, findSensorUnit->second, factor,
+                     psuProperty.maxReading, psuProperty.minReading,
+                     psuProperty.sensorOffset, labelHead, thresholdConfSize,
+-                    pollRate, i2cDev);
++                    pollRate, i2cDev, std::move(bridgeGpio));
++                pollRate = globalPollRate;
+                 sensors[sensorName]->setupRead();
+                 ++numCreated;
+                 if constexpr (debug)
+diff --git a/src/meson.build b/src/meson.build
+index 12f8ee5..f7d22cc 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -219,6 +219,7 @@ if get_option('psu').allowed()
+             pwmsensor_dep,
+             thresholds_dep,
+             utils_dep,
++            gpiodcxx,
+         ],
+         install: true,
+     )
