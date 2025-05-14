@@ -1,0 +1,33 @@
+From b827cb39e7e49b08783e5cac5fc8824c77735f08 Mon Sep 17 00:00:00 2001
+From: Tam Chi Nguyen <tamng@amperecomputing.com>
+Date: Wed, 14 May 2025 04:46:30 +0000
+Subject: [PATCH] fansensor: support pwm-fan mode pwm_enable signal
+
+The ast2600 pwm tach driver uses pwm-fan to add fan info. Currently, fansensor
+calculates pwmX_enable from pwm index, but in pwm-fan mode only has 1 channel
+and 1 enable signal. Which causes read/write error when accessing pwmX_enable
+
+   Error read/write "/sys/class/hwmon/hwmon6/pwm2_enable"
+
+This commit will use pwm-fan's enable signal when the default doesn't exist.
+
+Signed-off-by: Tam Chi Nguyen <tamng@amperecomputing.com>
+---
+ src/FanMain.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/FanMain.cpp b/src/FanMain.cpp
+index 736d07d..f2c56a8 100644
+--- a/src/FanMain.cpp
++++ b/src/FanMain.cpp
+@@ -526,6 +526,10 @@ void createSensors(
+                             "pwm" + std::to_string(pwm + 1) + "_enable";
+                         fs::path enablePath =
+                             pwmPath.parent_path() / pwmEnableFile;
++                        if (!fs::exists(enablePath))
++                        {
++                            enablePath = pwmPath.string() + "_enable";
++                        }
+                         enablePwm(enablePath);
+ 
+                         /* use pwm name override if found in configuration else
