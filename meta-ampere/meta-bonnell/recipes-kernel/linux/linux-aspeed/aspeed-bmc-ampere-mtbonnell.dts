@@ -88,6 +88,26 @@
 				<&adc1 0>, <&adc1 1>, <&adc1 2>, <&adc1 3>,
 				<&adc1 4>, <&adc1 5>, <&adc1 6>, <&adc1 7>;
 	};
+
+	pwm-fan0 {
+		compatible = "pwm-fan";
+		pwms = <&pwm_tach 0 40000 0>;	/* Target freq:25 kHz */
+	};
+
+	pwm-fan1 {
+		compatible = "pwm-fan";
+		pwms = <&pwm_tach 1 40000 0>;	/* Target freq:25 kHz */
+	};
+
+	pwm-fan2 {
+		compatible = "pwm-fan";
+		pwms = <&pwm_tach 2 40000 0>;	/* Target freq:25 kHz */
+	};
+
+	pwm-fan3 {
+		compatible = "pwm-fan";
+		pwms = <&pwm_tach 3 40000 0>;	/* Target freq:25 kHz */
+	};
 };
 
 &mac2 {
@@ -122,6 +142,49 @@
 		label = "alt-bmc";
 		spi-max-frequency = <50000000>;
 #include "openbmc-flash-layout-64-alt.dtsi"
+	};
+};
+
+&pwm_tach {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm0_default &pinctrl_pwm1_default
+		&pinctrl_pwm2_default &pinctrl_pwm3_default
+		&pinctrl_tach0_default &pinctrl_tach1_default
+		&pinctrl_tach2_default &pinctrl_tach3_default
+		&pinctrl_tach4_default &pinctrl_tach5_default
+		&pinctrl_tach6_default &pinctrl_tach7_default>;
+
+	tach0-I@0 {
+		tach-ch = <0x00>;
+		min-rpm = <700>;
+	};
+	tach0-O@1 {
+		tach-ch = <0x01>;
+		min-rpm = <700>;
+	};
+	tach1-I@2 {
+		tach-ch = <0x02>;
+		min-rpm = <700>;
+	};
+	tach1-O@3 {
+		tach-ch = <0x03>;
+		min-rpm = <700>;
+	};
+	tach2-I@4 {
+		tach-ch = <0x04>;
+		min-rpm = <700>;
+	};
+	tach2-O@5 {
+		tach-ch = <0x05>;
+		min-rpm = <700>;
+	};
+	tach3-I@6 {
+		tach-ch = <0x06>;
+		min-rpm = <700>;
+	};
+	tach3-O@7 {
+		tach-ch = <0x07>;
+		min-rpm = <700>;
 	};
 };
 
@@ -353,7 +416,7 @@
 	/*E0-E7*/	"","bmc-pal-pwr-btn-n","","","","","","",
 	/*F0-F7*/	"","","","i2c-backup-sel","","","","",
 	/*G0-G7*/	"","","","","host0-sysreset-n","","","s0-plimit",
-	/*H0-H7*/	"uart3-mode1","uart2-mode1","uart1-mode1","","","","","",
+	/*H0-H7*/	"uart3-mode1","uart2-mode1","uart1-mode1","vrd-prg-en-l","","","","",
 	/*I0-I7*/	"","","bmc-ready-n","host-online-en","","s0-vr-hot-n","","",
 	/*J0-J7*/	"","","","","","","","",
 	/*K0-K7*/	"","","","","","","","",
@@ -386,7 +449,7 @@
 
 &gpio1 {
  	gpio-line-names =
-	/*18A0-18A7*/	"","","","","","","","",
+	/*18A0-18A7*/	"fan0-prsnt-n","fan1-prsnt-n","fan2-prsnt-n","fan3-prsnt-n","","","","",
 	/*18B0-18B7*/	"","","","","","","","",
 	/*18C0-18C7*/	"","","","","","","","",
 	/*18D0-18D7*/	"","","s0-vr1-pmbus-sel","s0-vr0-pmbus-sel","","host0-shd-ack-n","","",

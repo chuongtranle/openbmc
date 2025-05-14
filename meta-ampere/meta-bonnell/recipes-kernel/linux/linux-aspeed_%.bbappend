@@ -3,6 +3,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 SRC_URI += " \
             file://${MACHINE}.cfg \
             file://${KMACHINE}-bmc-ampere-${MACHINE}.dts \
+            file://0300-aspeed-g6.dtsi-update-for-PWM-and-TACH-driver.patch \
            "
 
 
