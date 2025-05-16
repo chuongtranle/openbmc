@@ -627,6 +627,7 @@
                 },
                 "PowerState": "On",
                 "Name": "FAN0_F",
+                "MaxReading": 31000,
                 "Thresholds": [
                     {
                         "Direction": "less than",
@@ -638,7 +639,7 @@
                         "Direction": "greater than",
                         "Name": "upper critical",
                         "Severity": 1,
-                        "Value": 23100
+                        "Value": 31000
                     }
                 ],
                 "Type": "AspeedFan"
@@ -658,6 +659,7 @@
                     "Polarity": "Low"
                 },
                 "Name": "FAN0_R",
+                "MaxReading": 31000,
                 "PowerState": "On",
                 "Thresholds": [
                     {
@@ -670,7 +672,7 @@
                         "Direction": "greater than",
                         "Name": "upper critical",
                         "Severity": 1,
-                        "Value": 23100
+                        "Value": 31000
                     }
                 ],
                 "Type": "AspeedFan"
@@ -690,6 +692,7 @@
                     "Polarity": "Low"
                 },
                 "Name": "FAN1_R",
+                "MaxReading": 31000,
                 "PowerState": "On",
                 "Thresholds": [
                     {
@@ -702,7 +705,7 @@
                         "Direction": "greater than",
                         "Name": "upper critical",
                         "Severity": 1,
-                        "Value": 23100
+                        "Value": 31000
                     }
                 ],
                 "Type": "AspeedFan"
@@ -721,7 +724,8 @@
                     "PinName": "fan1-prsnt-n",
                     "Polarity": "Low"
                 },
-                "Name": "FAN1_L",
+                "Name": "FAN1_F",
+                "MaxReading": 31000,
                 "PowerState": "On",
                 "Thresholds": [
                     {
@@ -734,7 +738,7 @@
                         "Direction": "greater than",
                         "Name": "upper critical",
                         "Severity": 1,
-                        "Value": 23100
+                        "Value": 31000
                     }
                 ],
                 "Type": "AspeedFan"
@@ -754,6 +758,7 @@
                     "Polarity": "Low"
                 },
                 "Name": "FAN2_R",
+                "MaxReading": 31000,
                 "PowerState": "On",
                 "Thresholds": [
                     {
@@ -766,7 +771,7 @@
                         "Direction": "greater than",
                         "Name": "upper critical",
                         "Severity": 1,
-                        "Value": 23100
+                        "Value": 31000
                     }
                 ],
                 "Type": "AspeedFan"
@@ -785,7 +790,8 @@
                     "PinName": "fan2-prsnt-n",
                     "Polarity": "Low"
                 },
-                "Name": "FAN2_L",
+                "Name": "FAN2_F",
+                "MaxReading": 31000,
                 "PowerState": "On",
                 "Thresholds": [
                     {
@@ -798,71 +804,7 @@
                         "Direction": "greater than",
                         "Name": "upper critical",
                         "Severity": 1,
-                        "Value": 23100
-                    }
-                ],
-                "Type": "AspeedFan"
-            },
-            {
-                "Connector": {
-                    "Name": "Fan Connector 4",
-                    "Pwm": 3,
-                    "PwmName": "PWM3",
-                    "Tachs": [
-                        6
-                    ]
-                },
-                "Index": 6,
-                "Presence": {
-                    "PinName": "fan3-prsnt-n",
-                    "Polarity": "Low"
-                },
-                "PowerState": "On",
-                "Name": "FAN3_R",
-                "Thresholds": [
-                    {
-                        "Direction": "less than",
-                        "Name": "lower critical",
-                        "Severity": 1,
-                        "Value": 500
-                    },
-                    {
-                        "Direction": "greater than",
-                        "Name": "upper critical",
-                        "Severity": 1,
-                        "Value": 23100
-                    }
-                ],
-                "Type": "AspeedFan"
-            },
-            {
-                "Connector": {
-                    "Name": "Fan Connector 4",
-                    "Pwm": 3,
-                    "PwmName": "PWM3",
-                    "Tachs": [
-                        6
-                    ]
-                },
-                "Index": 7,
-                "Presence": {
-                    "PinName": "fan3-prsnt-n",
-                    "Polarity": "Low"
-                },
-                "Name": "FAN3_L",
-                "PowerState": "On",
-                "Thresholds": [
-                    {
-                        "Direction": "less than",
-                        "Name": "lower critical",
-                        "Severity": 1,
-                        "Value": 500
-                    },
-                    {
-                        "Direction": "greater than",
-                        "Name": "upper critical",
-                        "Severity": 1,
-                        "Value": 23100
+                        "Value": 31000
                     }
                 ],
                 "Type": "AspeedFan"

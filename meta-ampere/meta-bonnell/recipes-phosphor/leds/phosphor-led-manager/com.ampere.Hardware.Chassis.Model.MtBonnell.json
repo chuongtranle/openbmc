@@ -47,7 +47,7 @@
 			]
 		},
 		{
-			"group": "fan3_fault",
+			"group": "fan0_fault",
 			"members": [
 				{
 					"Name": "fault",
@@ -59,7 +59,7 @@
 			]
 		},
 		{
-			"group": "fan4_fault",
+			"group": "fan1_fault",
 			"members": [
 				{
 					"Name": "fault",
@@ -71,43 +71,7 @@
 			]
 		},
 		{
-			"group": "fan5_fault",
-			"members": [
-				{
-					"Name": "fault",
-					"Action": "On",
-					"Priority": "On",
-					"DutyOn": 50,
-					"Period": 1000
-				}
-			]
-		},
-		{
-			"group": "fan6_fault",
-			"members": [
-				{
-					"Name": "fault",
-					"Action": "On",
-					"Priority": "On",
-					"DutyOn": 50,
-					"Period": 1000
-				}
-			]
-		},
-		{
-			"group": "fan7_fault",
-			"members": [
-				{
-					"Name": "fault",
-					"Action": "On",
-					"Priority": "On",
-					"DutyOn": 50,
-					"Period": 1000
-				}
-			]
-		},
-		{
-			"group": "fan8_fault",
+			"group": "fan2_fault",
 			"members": [
 				{
 					"Name": "fault",

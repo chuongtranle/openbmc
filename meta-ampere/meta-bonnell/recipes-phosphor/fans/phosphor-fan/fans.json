@@ -1,43 +1,22 @@
 [
     {
-        "name": "FAN3",
+        "name": "FAN0",
         "zone": "0",
-        "sensors": ["PWM3"],
+        "sensors": ["PWM0"],
         "target_interface": "xyz.openbmc_project.Control.FanPwm",
         "target_path": "/xyz/openbmc_project/control/fanpwm/"
     },
     {
-        "name": "FAN4",
+        "name": "FAN1",
         "zone": "0",
-        "sensors": ["PWM4"],
+        "sensors": ["PWM1"],
         "target_interface": "xyz.openbmc_project.Control.FanPwm",
         "target_path": "/xyz/openbmc_project/control/fanpwm/"
     },
     {
-        "name": "FAN5",
+        "name": "FAN2",
         "zone": "0",
-        "sensors": ["PWM5"],
-        "target_interface": "xyz.openbmc_project.Control.FanPwm",
-        "target_path": "/xyz/openbmc_project/control/fanpwm/"
-    },
-    {
-        "name": "FAN6",
-        "zone": "0",
-        "sensors": ["PWM6"],
-        "target_interface": "xyz.openbmc_project.Control.FanPwm",
-        "target_path": "/xyz/openbmc_project/control/fanpwm/"
-    },
-    {
-        "name": "FAN7",
-        "zone": "0",
-        "sensors": ["PWM7"],
-        "target_interface": "xyz.openbmc_project.Control.FanPwm",
-        "target_path": "/xyz/openbmc_project/control/fanpwm/"
-    },
-    {
-        "name": "FAN8",
-        "zone": "0",
-        "sensors": ["PWM8"],
+        "sensors": ["PWM2"],
         "target_interface": "xyz.openbmc_project.Control.FanPwm",
         "target_path": "/xyz/openbmc_project/control/fanpwm/"
     }

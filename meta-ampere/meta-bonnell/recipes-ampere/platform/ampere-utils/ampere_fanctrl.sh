@@ -6,6 +6,9 @@ if [ "$1" == "setspeed" ]; then
         pwm_scaled=$((((pwm_val * 255) + 50) / 100))
         for filename in /sys/class/hwmon/*/pwm*
         do
+            if [[ $filename =~ "_enable" ]]; then
+                continue
+            fi
             echo $pwm_scaled > "$filename"
         done
     else

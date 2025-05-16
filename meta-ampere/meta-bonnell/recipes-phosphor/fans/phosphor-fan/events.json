@@ -36,37 +36,17 @@
     "name": "set_target_fan_not_functional",
     "groups": [
       {
-        "name": "fan3",
+        "name": "fan0",
         "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
         "property": { "name": "Functional" }
       },
       {
-        "name": "fan4",
+        "name": "fan1",
         "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
         "property": { "name": "Functional" }
       },
       {
-        "name": "fan5",
-        "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
-        "property": { "name": "Functional" }
-      },
-      {
-        "name": "fan6",
-        "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
-        "property": { "name": "Functional" }
-      },
-      {
-        "name": "fan7",
-        "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
-        "property": { "name": "Functional" }
-      },
-      {
-        "name": "fan8",
-        "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
-        "property": { "name": "Functional" }
-      },
-      {
-        "name": "zone0_ambient",
+        "name": "fan2",
         "interface": "xyz.openbmc_project.State.Decorator.OperationalStatus",
         "property": { "name": "Functional" }
       },
