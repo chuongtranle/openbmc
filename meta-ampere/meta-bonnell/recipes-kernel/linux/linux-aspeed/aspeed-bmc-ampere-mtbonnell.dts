@@ -407,6 +407,10 @@
 	memory-region = <&video_engine_memory>;
 };
 
+&display_port {
+        status = "okay";
+};
+
 &gpio0 {
     gpio-line-names =
 	/*A0-A7*/	"","","","","","","","",
