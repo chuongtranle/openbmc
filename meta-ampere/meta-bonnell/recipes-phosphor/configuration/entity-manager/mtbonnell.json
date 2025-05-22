@@ -22,7 +22,6 @@
                     "in1",
                     "in2",
                     "in3",
-                    "in4",
                     "in5",
                     "in6",
                     "in7"
@@ -239,6 +238,159 @@
                     }
                 ],
                 "Type": "ADC"
+            },
+            {
+                "Address": "0x45",
+                "Bus": 0,
+                "Labels": [
+                    "temp1",
+                    "vin",
+                    "vout1",
+                    "iout1",
+                    "pin"
+                ],
+                "Name": "FAN_EFFUSE_12V",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Label": "pin",
+                        "Name": "upper non recoverable",
+                        "Severity": 4,
+                        "Value": 286.6
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Label": "pin",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 211.75
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Label": "pin",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 202.125
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Label": "vin",
+                        "Name": "upper non recoverable",
+                        "Severity": 4,
+                        "Value": 14.333
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Label": "vin",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 13.176
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Label": "vin",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 13.054
+                    },
+                    {
+                        "Direction": "less than",
+                        "Label": "vin",
+                        "Name": "lower non critical",
+                        "Severity": 0,
+                        "Value": 11.346
+                    },
+                    {
+                        "Direction": "less than",
+                        "Label": "vin",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 11.224
+                    },
+                    {
+                        "Direction": "less than",
+                        "Label": "vin",
+                        "Name": "lower non recoverable",
+                        "Severity": 4,
+                        "Value": 10.091
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Label": "vout1",
+                        "Name": "upper non recoverable",
+                        "Severity": 4,
+                        "Value": 14.333
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Label": "vout1",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 13.176
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Label": "vout1",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 13.054
+                    },
+                    {
+                        "Direction": "less than",
+                        "Label": "vout1",
+                        "Name": "lower non critical",
+                        "Severity": 0,
+                        "Value": 11.346
+                    },
+                    {
+                        "Direction": "less than",
+                        "Label": "vout1",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 11.224
+                    },
+                    {
+                        "Direction": "less than",
+                        "Label": "vout1",
+                        "Name": "lower non recoverable",
+                        "Severity": 4,
+                        "Value": 10.091
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Label": "iout1",
+                        "Name": "upper non recoverable",
+                        "Severity": 4,
+                        "Value": 20
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Label": "iout1",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 16.94
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Label": "iout1",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 16.17
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Label": "temp1",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 115
+                    }
+                ],
+                "Type": "MP5023",
+                "iout1_Name": "FAN_EFFUSE_12V_CURR_A",
+                "pin_Name": "FAN_EFFUSE_12V_INPUT_PWR_W",
+                "temp1_Name": "FAN_EFFUSE_12V_TEMP_C",
+                "vin_Name": "FAN_EFFUSE_12V_INPUT_VOLT_V",
+                "vout1_Name": "FAN_EFFUSE_12V_OUTPUT_VOLT_V"
             },
             {
                 "CPURequired": 0,

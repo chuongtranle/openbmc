@@ -230,34 +230,9 @@
 &i2c0 {
 	status = "okay";
 
-        mp5023@40 {
-		compatible = "mps,mp5023";
-		reg = <0x40>;
-	};
-
-        mp5023@43 {
-		compatible = "mps,mp5023";
-		reg = <0x43>;
-	};
-
-        mp5023@44 {
-		compatible = "mps,mp5023";
-		reg = <0x44>;
-	};
-
         mp5023@45 {
 		compatible = "mps,mp5023";
 		reg = <0x45>;
-	};
-
-        mp5023@41 {
-		compatible = "mps,mp5023";
-		reg = <0x41>;
-	};
-
-        mp5023@42 {
-		compatible = "mps,mp5023";
-		reg = <0x42>;
 	};
 
 	adc_i2c_0_37: adc@37 {
