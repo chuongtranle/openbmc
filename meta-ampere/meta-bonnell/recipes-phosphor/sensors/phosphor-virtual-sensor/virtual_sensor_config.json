@@ -137,10 +137,6 @@
             "SensorType": "current"
         },
         "Threshold": {
-            "CriticalHigh": 13.2,
-            "CriticalLow": 10.8,
-            "WarningHigh": 12.84,
-            "WarningLow": 11.16
         },
         "Associations":
         [
