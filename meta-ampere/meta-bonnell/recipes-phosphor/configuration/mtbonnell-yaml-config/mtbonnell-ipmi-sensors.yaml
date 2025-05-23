@@ -23,22 +23,6 @@
     <<: *TEMP_DEFAULTS
     entityInstance: 2
     path: /xyz/openbmc_project/sensors/temperature/TS2_Temp
-3:
-    <<: *TEMP_DEFAULTS
-    entityInstance: 3
-    path: /xyz/openbmc_project/sensors/temperature/TS3_Temp
-4:
-    <<: *TEMP_DEFAULTS
-    entityInstance: 4
-    path: /xyz/openbmc_project/sensors/temperature/TS4_Temp
-5:
-    <<: *TEMP_DEFAULTS
-    entityInstance: 5
-    path: /xyz/openbmc_project/sensors/temperature/TS5_Temp
-6:
-    <<: *TEMP_DEFAULTS
-    entityInstance: 6
-    path: /xyz/openbmc_project/sensors/temperature/TS6_Temp
 243:
     <<: *TEMP_DEFAULTS
     entityInstance: 58
@@ -52,7 +36,7 @@
   entityID: 29
   entityInstance: 13
   sensorType: 4
-  path: /xyz/openbmc_project/sensors/fan_tach/FAN3_1
+  path: /xyz/openbmc_project/sensors/fan_tach/FAN0_F
   sensorReadingType: 1
   multiplierM: 100
   offsetB: 0
@@ -72,47 +56,23 @@
 40:
     <<: *FAN_DEFAULTS
     entityInstance: 16
-    path: /xyz/openbmc_project/sensors/fan_tach/FAN3_2
+    path: /xyz/openbmc_project/sensors/fan_tach/FAN0_R
 43:
     <<: *FAN_DEFAULTS
     entityInstance: 19
-    path: /xyz/openbmc_project/sensors/fan_tach/FAN4_1
+    path: /xyz/openbmc_project/sensors/fan_tach/FAN1_F
 46:
     <<: *FAN_DEFAULTS
     entityInstance: 22
-    path: /xyz/openbmc_project/sensors/fan_tach/FAN4_2
+    path: /xyz/openbmc_project/sensors/fan_tach/FAN1_R
 49:
     <<: *FAN_DEFAULTS
     entityInstance: 25
-    path: /xyz/openbmc_project/sensors/fan_tach/FAN5_1
+    path: /xyz/openbmc_project/sensors/fan_tach/FAN2_F
 52:
     <<: *FAN_DEFAULTS
     entityInstance: 28
-    path: /xyz/openbmc_project/sensors/fan_tach/FAN5_2
-55:
-    <<: *FAN_DEFAULTS
-    entityInstance: 31
-    path: /xyz/openbmc_project/sensors/fan_tach/FAN6_1
-58:
-    <<: *FAN_DEFAULTS
-    entityInstance: 34
-    path: /xyz/openbmc_project/sensors/fan_tach/FAN6_2
-61:
-    <<: *FAN_DEFAULTS
-    entityInstance: 37
-    path: /xyz/openbmc_project/sensors/fan_tach/FAN7_1
-64:
-    <<: *FAN_DEFAULTS
-    entityInstance: 40
-    path: /xyz/openbmc_project/sensors/fan_tach/FAN7_2
-67:
-    <<: *FAN_DEFAULTS
-    entityInstance: 43
-    path: /xyz/openbmc_project/sensors/fan_tach/FAN8_1
-70:
-    <<: *FAN_DEFAULTS
-    entityInstance: 46
-    path: /xyz/openbmc_project/sensors/fan_tach/FAN8_2
+    path: /xyz/openbmc_project/sensors/fan_tach/FAN2_R
 245:
     <<: *FAN_DEFAULTS
     entityInstance: 60
@@ -210,12 +170,12 @@
     <<: *VOLTAGE_DEFAULTS
     entityInstance: 37
     multiplierM: 20
-    path: /xyz/openbmc_project/sensors/voltage/3V3_SB
+    path: /xyz/openbmc_project/sensors/voltage/S0_3V3_VRD
 102:
     <<: *VOLTAGE_DEFAULTS
     entityInstance: 38
     multiplierM: 18
-    path: /xyz/openbmc_project/sensors/voltage/VBAT_RTC
+    path: /xyz/openbmc_project/sensors/voltage/P3V_BAT
 230:
     <<: *VOLTAGE_DEFAULTS
     entityInstance: 74
