@@ -997,7 +997,7 @@
                 "Units": "Volts"
             },
             {
-                "Address": "0x28",
+                "Address": "0x4d",
                 "Bus": 3,
                 "Name": "TS1_Temp",
                 "Thresholds": [
@@ -1011,65 +1011,9 @@
                 "Type": "TMP175"
             },
             {
-                "Address": "0x29",
+                "Address": "0x4e",
                 "Bus": 3,
                 "Name": "TS2_Temp",
-                "Thresholds": [
-                    {
-                        "Direction": "greater than",
-                        "Name": "upper critical",
-                        "Severity": 1,
-                        "Value": 65
-                    }
-                ],
-                "Type": "TMP175"
-            },
-            {
-                "Address": "0x2a",
-                "Bus": 3,
-                "Name": "TS3_Temp",
-                "Thresholds": [
-                    {
-                        "Direction": "greater than",
-                        "Name": "upper critical",
-                        "Severity": 1,
-                        "Value": 65
-                    }
-                ],
-                "Type": "TMP175"
-            },
-            {
-                "Address": "0x2b",
-                "Bus": 3,
-                "Name": "TS4_Temp",
-                "Thresholds": [
-                    {
-                        "Direction": "greater than",
-                        "Name": "upper critical",
-                        "Severity": 1,
-                        "Value": 50
-                    }
-                ],
-                "Type": "TMP175"
-            },
-            {
-                "Address": "0x2c",
-                "Bus": 3,
-                "Name": "TS5_Temp",
-                "Thresholds": [
-                    {
-                        "Direction": "greater than",
-                        "Name": "upper critical",
-                        "Severity": 1,
-                        "Value": 65
-                    }
-                ],
-                "Type": "TMP175"
-            },
-            {
-                "Address": "0x2d",
-                "Bus": 3,
-                "Name": "TS6_Temp",
                 "Thresholds": [
                     {
                         "Direction": "greater than",
