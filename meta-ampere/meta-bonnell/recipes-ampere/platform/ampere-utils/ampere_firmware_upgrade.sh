@@ -58,16 +58,16 @@ do_smpmpro_upgrade() {
 		gpioset $(gpiofind s1-special-boot)=1
 	fi
 
-	# Switch EEPROM control to BMC AST2500 I2C
-	gpioset $(gpiofind spi0-program-sel)=0
+        # Enable EEPROM control to BMC AST2600 I2C (GPIOW0)
+	gpioset $(gpiofind i2c-program-sel)=0
 
-	# 08 is BMC_GPIOB0_I2C_BACKUP_SEL
+        # Select primary or secondary Boot EEPROM (GPIOF3)
 	if [[ $DEV_SEL == 1 ]]; then
 		echo "Run update primary Boot EEPROM"
-		gpioset $(gpiofind i2c-backup-sel)=1       # Main EEPROM
+		gpioset $(gpiofind i2c-backup-sel)=1       # Primary EEPROM
 	elif [[ $DEV_SEL == 2 ]]; then
 		echo "Run update secondary Boot EEPROM"
-		gpioset $(gpiofind i2c-backup-sel)=0       # Second EEPROM
+		gpioset $(gpiofind i2c-backup-sel)=0       # Secondary EEPROM
 	else
 		echo "Please choose Main (1) or Second EEPROM (2)"
 		exit 0
@@ -77,9 +77,8 @@ do_smpmpro_upgrade() {
 	ampere_eeprom_prog -b $I2C_BUS_DEV -s $EEPROM_ADDR -p -f "$IMAGE"
 
 	# Switch EEPROM control to Host
-	# 08 is BMC_GPIOB0_I2C_BACKUP_SEL
 	gpioset $(gpiofind i2c-backup-sel)=1
-	gpioset $(gpiofind spi0-program-sel)=1
+	gpioset $(gpiofind i2c-program-sel)=1
 
 	# Deassert SECPRO GPIO PINs
 	if [[ $SECPRO == 1 ]]; then
