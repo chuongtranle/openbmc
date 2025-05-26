@@ -214,6 +214,7 @@
                     }
                 ],
                 "Type": "ADC128D818",
+                "PowerState": "ChassisOn",
                 "Name": "ADC_128"
             },
             {
@@ -386,6 +387,7 @@
                     }
                 ],
                 "Type": "MP5023",
+                "PowerState": "ChassisOn",
                 "iout1_Name": "FAN_EFFUSE_12V_CURR_A",
                 "pin_Name": "FAN_EFFUSE_12V_INPUT_PWR_W",
                 "temp1_Name": "FAN_EFFUSE_12V_TEMP_C",
