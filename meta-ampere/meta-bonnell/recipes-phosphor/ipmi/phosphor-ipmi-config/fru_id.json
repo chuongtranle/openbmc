@@ -1,0 +1,27 @@
+[
+  {
+    "id" : 0,
+    "busIdx" : 3,
+    "addrIdx" : 80
+  },
+  {
+    "id" : 1,
+    "busIdx" : 5,
+    "addrIdx" : 80
+  },
+  {
+    "id" : 2,
+    "busIdx" : 15,
+    "addrIdx" : 80
+  },
+  {
+    "id" : 3,
+    "busIdx" : 5,
+    "addrIdx" : 81
+  },
+  {
+    "id" : 4,
+    "busIdx" : 13,
+    "addrIdx" : 84
+  }
+]
