@@ -13,7 +13,7 @@ function post-platform-init() {
     gpioset $(gpiofind bmc-ready-n)=0
     gpioset $(gpiofind bmc-s0-mem-efgh-sel)=1
     gpioset $(gpiofind bmc-s0-mem-abcd-sel)=1
-    gpioset $(gpiofind bmc-vbat-sen-en)=0 # Enable for sense Battery voltage
+    gpioset $(gpiofind bmc-vbat-sen-en)=1 # Enable for sense Battery voltage
 
 }
 

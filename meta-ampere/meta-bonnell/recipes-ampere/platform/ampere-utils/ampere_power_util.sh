@@ -16,6 +16,52 @@ power_status() {
 	fi
 }
 
+host_status() {
+	st=$(busctl get-property xyz.openbmc_project.State.Host \
+		/xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host \
+		CurrentHostState | cut -d"." -f6)
+	if [ "$st" == "Running\"" ]; then
+		echo "on"
+		return
+	fi
+
+	val=$(gpioget $(gpiofind main-pgood))
+	if [ "$val" == 1 ]; then
+		echo "on"
+		return
+	fi
+	echo "off"
+}
+
+power_off() {
+	echo "Powering down Server"
+
+	if [ "$(power_status)" == "off" ]; then
+		exit
+	fi
+	# Wait for ampere-host-shutdown.service start and do gracefull shutdown
+
+	sleep 10s
+
+	if [ "$(host_status)" == "on" ]; then
+		gpioset $(gpiofind bmc-pal-pwr-btn-n)=0
+		sleep 1s
+		gpioset $(gpiofind bmc-pal-pwr-btn-n)=1
+		busctl set-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis RequestedPowerTransition s xyz.openbmc_project.State.Chassis.Transition.Off
+	fi
+}
+
+power_on() {
+	if [ "$(power_status)" == "on" ]; then
+		exit
+	fi
+	echo "toggle power button"
+	gpioset $(gpiofind bmc-pal-pwr-btn-n)=0
+	sleep 1
+	gpioset $(gpiofind bmc-pal-pwr-btn-n)=1
+	busctl set-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis RequestedPowerTransition s xyz.openbmc_project.State.Chassis.Transition.On
+}
+
 shutdown_ack() {
 	if [ -f "/run/openbmc/host@0-softpoweroff" ]; then
 		echo "Receive shutdown ACK triggered after softportoff the host."
@@ -100,9 +146,14 @@ if [ "$2" == "shutdown_ack" ]; then
 	shutdown_ack
 elif [ "$2" == "status" ]; then
 	power_status
+elif [ "$2" == "power_on" ]; then
+	power_on
+elif [ "$2" == "power_off" ]; then
+	power_off
 elif [ "$2" == "force_reset" ]; then
 	force_reset
 elif [ "$2" == "soft_off" ]; then
+	# Gracefull shutdown
 	ret=$(soft_off)
 	if [ "$ret" == 0 ]; then
 		echo "The host is already softoff"

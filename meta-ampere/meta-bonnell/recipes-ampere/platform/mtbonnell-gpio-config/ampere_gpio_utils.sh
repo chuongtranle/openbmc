@@ -7,24 +7,18 @@ function usage() {
 }
 
 toggle_power_button() {
-  echo "toggle power button"
+	echo "toggle power button"
 	gpioset $(gpiofind bmc-pal-pwr-btn-n)=0
-  
-  sleep 1
-
+	sleep 1
 	gpioset $(gpiofind bmc-pal-pwr-btn-n)=1
 }
 
 set_gpio_power_off() {
 	echo "Setting GPIO before Power off"
-  
-  val=$(gpioget $(gpiofind host0-ready))
+	val=$(gpioget $(gpiofind host0-ready))
 	if [ "$val" == 0 ]; then
 		exit
 	fi
-  
-  toggle_power_button
-
 }
 
 set_gpio_power_on() {
@@ -35,8 +29,6 @@ set_gpio_power_on() {
 	fi
 	gpioset $(gpiofind spi0-program-sel)=1
 	gpioset $(gpiofind spi0-backup-sel)=0
-  
-  toggle_power_button
 }
 
 if [ $# -lt 2 ]; then
