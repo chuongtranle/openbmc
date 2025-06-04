@@ -119,7 +119,7 @@
 };
 
 &mac3 {
-	status = "okay";
+	status = "disabled";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_rmii4_default>;
 	clock-names = "MACCLK", "RCLK";
